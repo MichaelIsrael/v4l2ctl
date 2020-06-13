@@ -7,8 +7,11 @@ be used to read the name, driver, version and capabilities of a v4l2 device
 driver.
 
 # Install
+```
 pip install v4l2ctl
+```
 
 # Copyright and licence
 Copyright 2020, Michael Israel
+
 Licensed under the EUPL
