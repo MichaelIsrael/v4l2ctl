@@ -19,4 +19,4 @@ pip install v4l2ctl
 # Copyright and licence
 Copyright 2020, Michael Israel
 
-Licensed under the EUPL
+Licensed under [the EUPL](https://joinup.ec.europa.eu/software/page/eupl)
