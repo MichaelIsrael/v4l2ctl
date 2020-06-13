@@ -25,7 +25,7 @@ setuptools.setup(
         "Operating System :: POSIX :: Linux",
         "Topic :: Multimedia :: Video",
         "Topic :: Software Development :: Libraries",
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
     ],
     python_requires='>=3.6',
 )
