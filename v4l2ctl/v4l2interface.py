@@ -57,15 +57,9 @@ class IoctlError(Exception):
 class V4l2Capability(ctypes.Structure):
     """An implementation of struct v4l2_capability (linux/videodev.h)
 
-    Attributes:
-        driver: name of the driver module (e.g. "bttv")
-        card: name of the card (e.g. "Hauppauge WinTV")
-        bus_info: name of the bus (e.g. "PCI:" + pci_name(pci_dev) )
-        version: KERNEL_VERSION
-        capabilities: capabilities of the physical device as a whole
-        device_caps: capabilities accessed via this particular device (node)
+    Describes V4L2 device caps returned by VIDIOC_QUERYCAP
 
-    See also class CapabilityFlags.
+    See also :class:`CapabilityFlags`.
 
     :meta private:
     """
@@ -79,12 +73,22 @@ class V4l2Capability(ctypes.Structure):
         ('reserved', ctypes.c_uint32 * 3),
     ]
 
-    driver = None  # :noindex:
-    # :noindex:
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Name of the driver module (e.g. "bttv").
+    driver = None
+    #: Name of the card (e.g. "Hauppauge WinTV").
     card = None
+    #: Name of the bus (e.g. "PCI" + pci_name(pci_dev) ).
     bus_info = None
+    #: KERNEL_VERSION.
     version = None
+    #: Capabilities of the physical device as a whole.
     capabilities = None
+    #: Capabilities accessed via this particular device (node).
     device_caps = None
 
 
