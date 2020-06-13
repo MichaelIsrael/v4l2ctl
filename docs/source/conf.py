@@ -29,7 +29,6 @@ else:
     copyright_years = first_year
 
 copyright = '{}, {}'.format(copyright_years, author)
-
 # The full version, including alpha/beta/rc tags
 from v4l2ctl import __version__ as version  # noqa E402
 release = version
@@ -62,5 +61,7 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+master_doc = 'index'
 
 manpages_url = 'https://manpages.debian.org/{path}'
