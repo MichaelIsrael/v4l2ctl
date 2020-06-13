@@ -1,3 +1,5 @@
+![Python package](https://github.com/MichaelIsrael/v4l2ctl/workflows/Python%20package/badge.svg?branch=master&event=push)
+
 # v4l2ctl
 v4l2ctl is a python package to control v4l2 drivers.
 
