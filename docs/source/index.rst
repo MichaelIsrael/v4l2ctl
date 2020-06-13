@@ -38,8 +38,8 @@ Or check the website's :ref:`genindex`.
 
 Copyright and licence
 ======================
-Copyright 2020, Michael Israel
-Licensed under the `EUPL`_
+| Copyright 2020, Michael Israel
+| Licensed under the `EUPL`_
 
 
 .. _EUPL: https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
