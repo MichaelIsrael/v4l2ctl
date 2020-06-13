@@ -12,7 +12,6 @@ Module ioctlmacros
    :show-inheritance:
    :private-members:
    :special-members:
-   :inherited-members:
 
 Module v4l2interface
 --------------------
@@ -23,7 +22,6 @@ Module v4l2interface
    :show-inheritance:
    :private-members:
    :special-members:
-   :inherited-members:
 
 Module v4l2device
 ------------------
@@ -34,4 +32,3 @@ Module v4l2device
    :show-inheritance:
    :private-members:
    :special-members:
-   :inherited-members:
