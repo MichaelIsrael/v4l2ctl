@@ -1,5 +1,6 @@
 ![Python version](https://img.shields.io/pypi/pyversions/v4l2ctl)
 ![Build and test](https://github.com/MichaelIsrael/v4l2ctl/workflows/Build%20and%20test/badge.svg?branch=master&event=push)
+![Test publish](https://github.com/MichaelIsrael/v4l2ctl/workflows/Test%20publish/badge.svg?branch=master&event=push)
 [![Documentation Status](https://readthedocs.org/projects/v4l2ctl/badge/?version=latest)](https://v4l2ctl.readthedocs.io/en/latest/?badge=latest)
 ![Build and publish](https://github.com/MichaelIsrael/v4l2ctl/workflows/Build%20and%20publish/badge.svg?branch=master&event=release)
 ![Pypi version](https://img.shields.io/pypi/v/v4l2ctl)
