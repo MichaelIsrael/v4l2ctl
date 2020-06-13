@@ -1,4 +1,5 @@
 ![Python package](https://github.com/MichaelIsrael/v4l2ctl/workflows/Python%20package/badge.svg?branch=master&event=push)
+[![Documentation Status](https://readthedocs.org/projects/v4l2ctl/badge/?version=latest)](https://v4l2ctl.readthedocs.io/en/latest/?badge=latest)
 ![Upload Python Package](https://github.com/MichaelIsrael/v4l2ctl/workflows/Upload%20Python%20Package/badge.svg?branch=master&event=release)
 
 
