@@ -14,10 +14,10 @@
 # See the Licence for the specific language governing permissions and
 # limitations under the Licence.
 ###############################################################################
-__all__ = ["V4l2Device", "V4l2Capabilities", "CapabilityFlags"]
+__all__ = ["V4l2Device", "V4l2Capabilities"]
 __author__ = "Michael Israel"
 __version__ = "0.1a1"
 
 
-from .v4l2device import V4l2Device, V4l2Capabilities
-from .v4l2interface import CapabilityFlags
+from .v4l2device import V4l2Device
+from .v4l2interface import V4l2Capabilities
