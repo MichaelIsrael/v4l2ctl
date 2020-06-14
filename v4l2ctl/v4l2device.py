@@ -15,6 +15,7 @@
 # limitations under the Licence.
 ###############################################################################
 from .v4l2interface import VidIocOps, V4l2Capabilities
+from pathlib import Path
 
 
 class V4l2Device(object):
@@ -92,3 +93,53 @@ class V4l2Device(object):
         while, and not limited to this dev-file only.
         """
         return self._physical_caps
+
+    @staticmethod
+    def iter_devices(skip_links=True):
+        return V4l2DeviceIterator(skip_links)
+
+    def __repr__(self):
+        return "<V4l2Device object for '{}({})'>".format(self.name,
+                                                         self.device,
+                                                         )
+
+
+class V4l2DeviceIterator(object):
+    _v4l2_device_prefixes = ["video",
+                             "radio",
+                             "vbi",
+                             "swradio",
+                             "v4l-subdev",
+                             ]
+
+    def __init__(self, skip_links):
+        self._skip_links = skip_links
+
+    def __iter__(self):
+        dev_list = []
+        extend_dev_list = dev_list.extend
+
+        # Find all devices conforming to the v4l2 devices pattern.
+        slash_dev = Path(r"/dev")
+        for prefix in self._v4l2_device_prefixes:
+            extend_dev_list(slash_dev.glob(prefix+"*"))
+
+        if self._skip_links:
+            # Find redundant links.
+            to_remove = []
+            for idx, dev in enumerate(dev_list):
+                if dev.is_symlink() and dev.resolve() in dev_list:
+                    to_remove.append(idx)
+
+            # Remove links.
+            for dev_idx in reversed(to_remove):
+                del dev_list[dev_idx]
+
+        # Try to instanciate a V4l2Device object and yield it if successful.
+        for dev in dev_list:
+            try:
+                dev_instance = V4l2Device(dev)
+            except OSError:
+                continue
+            else:
+                yield dev_instance
