@@ -15,6 +15,7 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
+from .v4l2formats import V4l2FmtDesc
 from enum import IntFlag, IntEnum
 from fcntl import ioctl
 import ctypes
@@ -180,6 +181,52 @@ class V4l2Capabilities(IntFlag):
 
 
 ###############################################################################
+# An abstraction of enum v4l2_buf_type in linux/videodev2.h.
+# These are the buffer types used in V4l2FmtDesc.type.
+###############################################################################
+class V4l2BufferType(IntEnum):
+    """The v4l2 buffer types.
+
+    Used with :attribute:`enum_fmt`.
+    """
+    #: Buffer of a single-planar video capture stream, see Video Capture
+    #: Interface.
+    VIDEO_CAPTURE = 1
+    #: Buffer of a single-planar video output stream, see Video Output
+    #: Interface.
+    VIDEO_OUTPUT = 2
+    #: Buffer for video overlay, see Video Overlay Interface.
+    VIDEO_OVERLAY = 3
+    #: Buffer of a raw VBI capture stream, see Raw VBI Data Interface.
+    VBI_CAPTURE = 4
+    #: Buffer of a raw VBI output stream, see Raw VBI Data Interface.
+    VBI_OUTPUT = 5
+    #: Buffer of a sliced VBI capture stream, see Sliced VBI Data Interface.
+    SLICED_VBI_CAPTURE = 6
+    #: Buffer of a sliced VBI output stream, see Sliced VBI Data Interface.
+    SLICED_VBI_OUTPUT = 7
+    #: Buffer for video output overlay (OSD), see Video Output Overlay
+    #: Interface.
+    VIDEO_OUTPUT_OVERLAY = 8
+    #: Buffer of a multi-planar video capture stream, see Video Capture
+    #: Interface.
+    VIDEO_CAPTURE_MPLANE = 9
+    #: Buffer of a multi-planar video output stream, see Video Output
+    #: Interface.
+    VIDEO_OUTPUT_MPLANE = 10
+    #: Buffer for Software Defined Radio (SDR) capture stream, see Software
+    #: Defined Radio Interface (SDR).
+    SDR_CAPTURE = 11
+    #: Buffer for Software Defined Radio (SDR) output stream, see Software
+    #: Defined Radio Interface (SDR).
+    SDR_OUTPUT = 12
+    #: Buffer for metadata capture, see Metadata Interface.
+    META_CAPTURE = 13
+    #: Buffer for metadata output, see Metadata Interface.
+    META_OUTPUT = 14
+
+
+###############################################################################
 # An abstraction for all ioctl operations.
 ###############################################################################
 class IoctlDirection(IntEnum):
@@ -275,6 +322,10 @@ class VidIocOps(object):
         obj.query_cap = IoctlAbstraction(device, "QueryCap", IoctlDirection.R,
                                          'V', 0, V4l2Capability)
 
+        # define VIDIOC_ENUM_FMT _IOWR('V',  2, struct v4l2_fmtdesc)
+        obj.enum_fmt = IoctlAbstraction(device, "EnumFmt", IoctlDirection.RW,
+                                        'V', 2, V4l2FmtDesc)
+
         ###############################
         # End of supported callables. #
         ###############################
@@ -289,9 +340,13 @@ class VidIocOps(object):
         For more information see struct v4l2_capability in include/videodev2.h.
         """
 
+    def enum_fmt(self, index, type):
+        """Interface to the ioctl code VIDIOC_QUERYCAP.
+        For more information see struct v4l2_capability in include/videodev2.h.
+        """
+
     # TODO:
     """
-    ENUM_FMT = _IOWR('V',  2, V4l2Fmtdesc)
     G_FMT = _IOWR('V',  4, V4l2Format)
     S_FMT = _IOWR('V',  5, V4l2Format)
     REQBUFS = _IOWR('V',  8, V4l2Requestbuffers)

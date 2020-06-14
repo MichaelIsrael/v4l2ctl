@@ -15,7 +15,17 @@
 # limitations under the Licence.
 ###############################################################################
 from .v4l2interface import VidIocOps, V4l2Capabilities
+from .v4l2formats import V4l2Formats, V4l2FormatDescFlags
+from collections import namedtuple
 from pathlib import Path
+
+
+V4l2Format = namedtuple("V4l2Format", ["format", "description", "flags"])
+V4l2Format.__doc__ = "The v4l2 format information."
+V4l2Format.format.__doc__ = "The format type (see :class:`V4l2Formats`)."
+V4l2Format.description.__doc__ = "The format description."
+V4l2Format.flags.__doc__ = ("The format flags (see " +
+                            ":class:`V4l2FormatDescFlags`).")
 
 
 class V4l2Device(object):
@@ -96,13 +106,44 @@ class V4l2Device(object):
 
     @staticmethod
     def iter_devices(skip_links=True):
-        """Return an iterator over all v4l2 devices available."""
+        """Return an iterator over all v4l2 devices available.
+
+        Keyword arguments:
+            skip_links (bool): skip links and return every device only once
+                               (default True)
+
+        Returns:
+            an iterator
+        """
         return V4l2DeviceIterator(skip_links)
 
     def __repr__(self):
         return "<V4l2Device object for '{}({})'>".format(self.name,
                                                          self.device,
                                                          )
+
+    def iter_buffer_formats(self, buffer_type):
+        """Iterate over the formats supported by a certain buffer.
+
+        Keyword arguments:
+            buffer_type:
+
+        Returns:
+            a generator
+        """
+        idx = 0
+        # Well, I guess the sky is the limit. index is 32 bits wide.
+        while idx < 2**32:
+            try:
+                fmt_desc = self._ioc_ops.enum_fmt(index=idx, type=buffer_type)
+            except OSError:
+                break
+            else:
+                yield V4l2Format(V4l2Formats(fmt_desc.pixelformat),
+                                 fmt_desc.description.decode(),
+                                 V4l2FormatDescFlags(fmt_desc.flags),
+                                 )
+                idx += 1
 
 
 class V4l2DeviceIterator(object):
