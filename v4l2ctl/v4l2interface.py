@@ -59,7 +59,8 @@ class V4l2Capability(ctypes.Structure):
 
     Describes V4L2 device caps returned by VIDIOC_QUERYCAP
 
-    See also :class:`CapabilityFlags`.
+    For the values of :attribute:`capabilities` and :attribute:`device_caps`,
+    see :class:`V4l2Capabilities`.
 
     :meta private:
     """
@@ -84,19 +85,33 @@ class V4l2Capability(ctypes.Structure):
     card = None
     #: Name of the bus (e.g. "PCI" + pci_name(pci_dev) ).
     bus_info = None
-    #: KERNEL_VERSION.
+    #: The driver version.
     version = None
     #: Capabilities of the physical device as a whole.
     capabilities = None
     #: Capabilities accessed via this particular device (node).
     device_caps = None
+    #: Reserved for future extensions.
+    reserved = None
 
 
 ###############################################################################
 # An abstraction of the capabilities' directives defined in linux/videodev2.h.
+# These are the capabilities used in V4l2Capability.capabilities and
+# V4l2Capability.device_caps.
 ###############################################################################
-class CapabilityFlags(IntFlag):
-    """Values for the 'capabilities' field in V4l2Capability().  """
+class V4l2Capabilities(IntFlag):
+    """The v4l2 capability flags.
+
+    These are the flags defining the supported capabilities of a V4l2 devince.
+
+    Example:
+        Check if device /dev/video0 supports video capturing::
+
+            vid_dev = VideoDevice(r"/dev/video0")
+            if CapabilityFlags.VIDEO_CAPTURE in vid_dev.capabilities:
+                start_recording()
+    """
     #: Is a video capture device.
     VIDEO_CAPTURE = 0x00000001
     #: Is a video output device.
@@ -242,16 +257,24 @@ class VidIocOps(object):
     def __new__(cls, device):
         # Create base object.
         obj = super().__new__(cls)
-        # Add real callables.
-        obj.querycap = IoctlAbstraction(device, "QueryCap", IoctlDirection.R,
-                                        'V', 0, V4l2Capability)
+
+        #######################
+        # Add real callables. #
+        #######################
+        # define VIDIOC_QUERYCAP _IOR('V',  0, struct v4l2_capability)
+        obj.query_cap = IoctlAbstraction(device, "QueryCap", IoctlDirection.R,
+                                         'V', 0, V4l2Capability)
+
+        ###############################
+        # End of supported callables. #
+        ###############################
         return obj
 
     ###########################################################################
     # The following are dummy functions for documentation purpose only. The
     # real callables are assigned in __new__.
     ###########################################################################
-    def querycap(self):
+    def query_cap(self):
         """Interface to the ioctl code VIDIOC_QUERYCAP.
         For more information see struct v4l2_capability in include/videodev2.h.
         """

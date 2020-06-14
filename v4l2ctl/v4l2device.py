@@ -14,29 +14,7 @@
 # See the Licence for the specific language governing permissions and
 # limitations under the Licence.
 ###############################################################################
-from .v4l2interface import VidIocOps, CapabilityFlags
-
-
-class V4l2Capabilities(int):
-    """The v4l2 capabilities.
-    This is basically an 'int' that supports checking if a certain capability
-    is supported using the 'in' operator.
-
-    Example:
-        Check if device /dev/video0 supports video capturing::
-
-            vid_dev = VideoDevice(r"/dev/video0")
-            if CapabilityFlags.VIDEO_CAPTURE in vid_dev.capabilities:
-                start_recording()
-    """
-    def __init__(self, caps):
-        self._caps = caps
-
-    def __contains__(self, capability):
-        return (capability | self) != 0
-
-    def __repr__(self):
-        return "<VideoCapabilities: {:#010X}>".format(self._caps)
+from .v4l2interface import VidIocOps, V4l2Capabilities
 
 
 class V4l2Device(object):
@@ -54,7 +32,7 @@ class V4l2Device(object):
         self._ioc_ops = VidIocOps(self._device)
 
         # Query capabilities and basic information
-        caps = self._ioc_ops.querycap()
+        caps = self._ioc_ops.query_cap()
 
         self._driver = caps.driver.decode()
         self._name = caps.card.decode()
@@ -68,7 +46,7 @@ class V4l2Device(object):
         self._physical_caps = V4l2Capabilities(caps.capabilities)
         # If the device has device-specific capabilities store them
         # accordingly. Otherwise, use the physical ones.
-        if CapabilityFlags.DEVICE_CAPS in self._physical_caps:
+        if V4l2Capabilities.DEVICE_CAPS in self._physical_caps:
             self._device_caps = V4l2Capabilities(caps.device_caps)
         else:
             self._device_caps = self._physical_caps
