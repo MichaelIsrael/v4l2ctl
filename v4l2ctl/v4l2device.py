@@ -96,6 +96,7 @@ class V4l2Device(object):
 
     @staticmethod
     def iter_devices(skip_links=True):
+        """Return an iterator over all v4l2 devices available."""
         return V4l2DeviceIterator(skip_links)
 
     def __repr__(self):
