@@ -218,10 +218,20 @@ class IoctlAbstraction(object):
                           _IOC_TYPECHECK(buffer_type),
                           )
 
-    def __call__(self):
+    def __call__(self, **kwargs):
         """Runs the ioctl request and returns the buffers."""
         # Create the buffer.
         buff = self._buffer_type()
+
+        # Store user data (for writable ioctls).
+        for key, value in kwargs.items():
+            # Just to make sure this is a defined field ;)
+            # Otherwise, a new attribute which is not part of the c structure
+            # will be created, and may cause weird difficult to detect
+            # behaviors.
+            getattr(buff, key)
+            # Now set it.
+            setattr(buff, key, value)
 
         # Run the ioctl request.
         with open(self._device, "rb") as dev_fd:
