@@ -32,13 +32,19 @@ class V4l2Device(object):
     """Initialize the VideoDevice object and read its basic information.
 
     Keyword arguments:
-        device: the video device (default r"/dev/video0")
+        device (str, path-like, int): the video device (default r"/dev/video0")
+                if an int is given, it is assumed to be number after "video" in
+                "/dev".
 
     Raises:
         OSError: if a non-video device file is given.
     """
     def __init__(self, device=r"/dev/video0"):
+        if isinstance(device, int):
+            device = Path(r"/dev/video{}".format(device))
+
         self._device = device
+
         # Create VidIocOps object for the ioctl operations.
         self._ioc_ops = VidIocOps(self._device)
 
