@@ -15,7 +15,7 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
-from .v4l2formats import V4l2FmtDesc
+from .v4l2formats import V4l2IoctlFmtDesc
 from enum import IntFlag, IntEnum
 from fcntl import ioctl
 import ctypes
@@ -55,7 +55,7 @@ class IoctlError(Exception):
 #   * @reserved:     reserved fields for future extensions
 #   */
 ###############################################################################
-class V4l2Capability(ctypes.Structure):
+class V4l2IoctlCapability(ctypes.Structure):
     """An implementation of struct v4l2_capability (linux/videodev.h)
 
     Describes V4L2 device caps returned by VIDIOC_QUERYCAP
@@ -98,8 +98,8 @@ class V4l2Capability(ctypes.Structure):
 
 ###############################################################################
 # An abstraction of the capabilities' directives defined in linux/videodev2.h.
-# These are the capabilities used in V4l2Capability.capabilities and
-# V4l2Capability.device_caps.
+# These are the capabilities used in V4l2IoctlCapability.capabilities and
+# V4l2IoctlCapability.device_caps.
 ###############################################################################
 class V4l2Capabilities(IntFlag):
     """The v4l2 capability flags.
@@ -182,7 +182,7 @@ class V4l2Capabilities(IntFlag):
 
 ###############################################################################
 # An abstraction of enum v4l2_buf_type in linux/videodev2.h.
-# These are the buffer types used in V4l2FmtDesc.type.
+# These are the buffer types used in V4l2IoctlFmtDesc.type.
 ###############################################################################
 class V4l2BufferType(IntEnum):
     """The v4l2 buffer types.
@@ -320,11 +320,11 @@ class VidIocOps(object):
         #######################
         # define VIDIOC_QUERYCAP _IOR('V',  0, struct v4l2_capability)
         obj.query_cap = IoctlAbstraction(device, "QueryCap", IoctlDirection.R,
-                                         'V', 0, V4l2Capability)
+                                         'V', 0, V4l2IoctlCapability)
 
         # define VIDIOC_ENUM_FMT _IOWR('V',  2, struct v4l2_fmtdesc)
         obj.enum_fmt = IoctlAbstraction(device, "EnumFmt", IoctlDirection.RW,
-                                        'V', 2, V4l2FmtDesc)
+                                        'V', 2, V4l2IoctlFmtDesc)
 
         ###############################
         # End of supported callables. #
@@ -341,90 +341,91 @@ class VidIocOps(object):
         """
 
     def enum_fmt(self, index, type):
+        # TODO: FIX docstring.
         """Interface to the ioctl code VIDIOC_QUERYCAP.
         For more information see struct v4l2_capability in include/videodev2.h.
         """
 
     # TODO:
     """
-    G_FMT = _IOWR('V',  4, V4l2Format)
-    S_FMT = _IOWR('V',  5, V4l2Format)
-    REQBUFS = _IOWR('V',  8, V4l2Requestbuffers)
-    QUERYBUF = _IOWR('V',  9, V4l2Buffer)
-    G_FBUF = _IOR('V', 10, V4l2Framebuffer)
-    S_FBUF = _IOW('V', 11, V4l2Framebuffer)
+    G_FMT = _IOWR('V',  4, V4l2IoctlFormat)
+    S_FMT = _IOWR('V',  5, V4l2IoctlFormat)
+    REQBUFS = _IOWR('V',  8, V4l2IoctlRequestbuffers)
+    QUERYBUF = _IOWR('V',  9, V4l2IoctlBuffer)
+    G_FBUF = _IOR('V', 10, V4l2IoctlFramebuffer)
+    S_FBUF = _IOW('V', 11, V4l2IoctlFramebuffer)
     OVERLAY = _IOW('V', 14, int)
-    QBUF = _IOWR('V', 15, V4l2Buffer)
-    EXPBUF = _IOWR('V', 16, V4l2Exportbuffer)
-    DQBUF = _IOWR('V', 17, V4l2Buffer)
+    QBUF = _IOWR('V', 15, V4l2IoctlBuffer)
+    EXPBUF = _IOWR('V', 16, V4l2IoctlExportbuffer)
+    DQBUF = _IOWR('V', 17, V4l2IoctlBuffer)
     STREAMON = _IOW('V', 18, int)
     STREAMOFF = _IOW('V', 19, int)
-    G_PARM = _IOWR('V', 21, V4l2Streamparm)
-    S_PARM = _IOWR('V', 22, V4l2Streamparm)
+    G_PARM = _IOWR('V', 21, V4l2IoctlStreamparm)
+    S_PARM = _IOWR('V', 22, V4l2IoctlStreamparm)
     G_STD = _IOR('V', 23, v4l2_std_id)
     S_STD = _IOW('V', 24, v4l2_std_id)
-    ENUMSTD = _IOWR('V', 25, V4l2Standard)
-    ENUMINPUT = _IOWR('V', 26, V4l2Input)
-    G_CTRL = _IOWR('V', 27, V4l2Control)
-    S_CTRL = _IOWR('V', 28, V4l2Control)
-    G_TUNER = _IOWR('V', 29, V4l2Tuner)
-    S_TUNER = _IOW('V', 30, V4l2Tuner)
-    G_AUDIO = _IOR('V', 33, V4l2Audio)
-    S_AUDIO = _IOW('V', 34, V4l2Audio)
-    QUERYCTRL = _IOWR('V', 36, V4l2Queryctrl)
-    QUERYMENU = _IOWR('V', 37, V4l2Querymenu)
+    ENUMSTD = _IOWR('V', 25, V4l2IoctlStandard)
+    ENUMINPUT = _IOWR('V', 26, V4l2IoctlInput)
+    G_CTRL = _IOWR('V', 27, V4l2IoctlControl)
+    S_CTRL = _IOWR('V', 28, V4l2IoctlControl)
+    G_TUNER = _IOWR('V', 29, V4l2IoctlTuner)
+    S_TUNER = _IOW('V', 30, V4l2IoctlTuner)
+    G_AUDIO = _IOR('V', 33, V4l2IoctlAudio)
+    S_AUDIO = _IOW('V', 34, V4l2IoctlAudio)
+    QUERYCTRL = _IOWR('V', 36, V4l2IoctlQueryctrl)
+    QUERYMENU = _IOWR('V', 37, V4l2IoctlQuerymenu)
     G_INPUT = _IOR('V', 38, int)
     S_INPUT = _IOWR('V', 39, int)
-    G_EDID = _IOWR('V', 40, V4l2Edid)
-    S_EDID = _IOWR('V', 41, V4l2Edid)
+    G_EDID = _IOWR('V', 40, V4l2IoctlEdid)
+    S_EDID = _IOWR('V', 41, V4l2IoctlEdid)
     G_OUTPUT = _IOR('V', 46, int)
     S_OUTPUT = _IOWR('V', 47, int)
-    ENUMOUTPUT = _IOWR('V', 48, V4l2Output)
-    G_AUDOUT = _IOR('V', 49, V4l2Audioout)
-    S_AUDOUT = _IOW('V', 50, V4l2Audioout)
-    G_MODULATOR = _IOWR('V', 54, V4l2Modulator)
-    S_MODULATOR = _IOW('V', 55, V4l2Modulator)
-    G_FREQUENCY = _IOWR('V', 56, V4l2Frequency)
-    S_FREQUENCY = _IOW('V', 57, V4l2Frequency)
-    CROPCAP = _IOWR('V', 58, V4l2Cropcap)
-    G_CROP = _IOWR('V', 59, V4l2Crop)
-    S_CROP = _IOW('V', 60, V4l2Crop)
-    G_JPEGCOMP = _IOR('V', 61, V4l2Jpegcompression)
-    S_JPEGCOMP = _IOW('V', 62, V4l2Jpegcompression)
+    ENUMOUTPUT = _IOWR('V', 48, V4l2IoctlOutput)
+    G_AUDOUT = _IOR('V', 49, V4l2IoctlAudioout)
+    S_AUDOUT = _IOW('V', 50, V4l2IoctlAudioout)
+    G_MODULATOR = _IOWR('V', 54, V4l2IoctlModulator)
+    S_MODULATOR = _IOW('V', 55, V4l2IoctlModulator)
+    G_FREQUENCY = _IOWR('V', 56, V4l2IoctlFrequency)
+    S_FREQUENCY = _IOW('V', 57, V4l2IoctlFrequency)
+    CROPCAP = _IOWR('V', 58, V4l2IoctlCropcap)
+    G_CROP = _IOWR('V', 59, V4l2IoctlCrop)
+    S_CROP = _IOW('V', 60, V4l2IoctlCrop)
+    G_JPEGCOMP = _IOR('V', 61, V4l2IoctlJpegcompression)
+    S_JPEGCOMP = _IOW('V', 62, V4l2IoctlJpegcompression)
     QUERYSTD = _IOR('V', 63, v4l2_std_id)
-    TRY_FMT = _IOWR('V', 64, V4l2Format)
-    ENUMAUDIO = _IOWR('V', 65, V4l2Audio)
-    ENUMAUDOUT = _IOWR('V', 66, V4l2Audioout)
+    TRY_FMT = _IOWR('V', 64, V4l2IoctlFormat)
+    ENUMAUDIO = _IOWR('V', 65, V4l2IoctlAudio)
+    ENUMAUDOUT = _IOWR('V', 66, V4l2IoctlAudioout)
     G_PRIORITY = _IOR('V', 67, __u32)
     S_PRIORITY = _IOW('V', 68, __u32)
-    G_SLICED_VBI_CAP = _IOWR('V', 69, V4l2SlicedVbiCap)
+    G_SLICED_VBI_CAP = _IOWR('V', 69, V4l2IoctlSlicedVbiCap)
     LOG_STATUS = _IO('V', 70)
-    G_EXT_CTRLS = _IOWR('V', 71, V4l2ExtControls)
-    S_EXT_CTRLS = _IOWR('V', 72, V4l2ExtControls)
-    TRY_EXT_CTRLS = _IOWR('V', 73, V4l2ExtControls)
-    ENUM_FRAMESIZES = _IOWR('V', 74, V4l2Frmsizeenum)
-    ENUM_FRAMEINTERVALS = _IOWR('V', 75, V4l2Frmivalenum)
-    G_ENC_INDEX = _IOR('V', 76, V4l2EncIdx)
-    ENCODER_CMD = _IOWR('V', 77, V4l2EncoderCmd)
-    TRY_ENCODER_CMD = _IOWR('V', 78, V4l2EncoderCmd)
-    DBG_S_REGISTER = _IOW('V', 79, V4l2DbgRegister)
-    DBG_G_REGISTER = _IOWR('V', 80, V4l2DbgRegister)
-    S_HW_FREQ_SEEK = _IOW('V', 82, V4l2HwFreqSeek)
-    S_DV_TIMINGS = _IOWR('V', 87, V4l2DvTimings)
-    G_DV_TIMINGS = _IOWR('V', 88, V4l2DvTimings)
-    DQEVENT = _IOR('V', 89, V4l2Event)
-    SUBSCRIBE_EVENT = _IOW('V', 90, V4l2EventSubscription)
-    UNSUBSCRIBE_EVENT = _IOW('V', 91, V4l2EventSubscription)
-    CREATE_BUFS = _IOWR('V', 92, V4l2CreateBuffers)
-    PREPARE_BUF = _IOWR('V', 93, V4l2Buffer)
-    G_SELECTION = _IOWR('V', 94, V4l2Selection)
-    S_SELECTION = _IOWR('V', 95, V4l2Selection)
-    DECODER_CMD = _IOWR('V', 96, V4l2DecoderCmd)
-    TRY_DECODER_CMD = _IOWR('V', 97, V4l2DecoderCmd)
-    ENUM_DV_TIMINGS = _IOWR('V', 98, V4l2EnumDvTimings)
-    QUERY_DV_TIMINGS = _IOR('V', 99, V4l2DvTimings)
-    DV_TIMINGS_CAP = _IOWR('V', 100, V4l2DvTimingsCap)
-    ENUM_FREQ_BANDS = _IOWR('V', 101, V4l2FrequencyBand)
-    DBG_G_CHIP_INFO = _IOWR('V', 102, V4l2DbgChipInfo)
-    QUERY_EXT_CTRL = _IOWR('V', 103, V4l2QueryExtCtrl)
+    G_EXT_CTRLS = _IOWR('V', 71, V4l2IoctlExtControls)
+    S_EXT_CTRLS = _IOWR('V', 72, V4l2IoctlExtControls)
+    TRY_EXT_CTRLS = _IOWR('V', 73, V4l2IoctlExtControls)
+    ENUM_FRAMESIZES = _IOWR('V', 74, V4l2IoctlFrmsizeenum)
+    ENUM_FRAMEINTERVALS = _IOWR('V', 75, V4l2IoctlFrmivalenum)
+    G_ENC_INDEX = _IOR('V', 76, V4l2IoctlEncIdx)
+    ENCODER_CMD = _IOWR('V', 77, V4l2IoctlEncoderCmd)
+    TRY_ENCODER_CMD = _IOWR('V', 78, V4l2IoctlEncoderCmd)
+    DBG_S_REGISTER = _IOW('V', 79, V4l2IoctlDbgRegister)
+    DBG_G_REGISTER = _IOWR('V', 80, V4l2IoctlDbgRegister)
+    S_HW_FREQ_SEEK = _IOW('V', 82, V4l2IoctlHwFreqSeek)
+    S_DV_TIMINGS = _IOWR('V', 87, V4l2IoctlDvTimings)
+    G_DV_TIMINGS = _IOWR('V', 88, V4l2IoctlDvTimings)
+    DQEVENT = _IOR('V', 89, V4l2IoctlEvent)
+    SUBSCRIBE_EVENT = _IOW('V', 90, V4l2IoctlEventSubscription)
+    UNSUBSCRIBE_EVENT = _IOW('V', 91, V4l2IoctlEventSubscription)
+    CREATE_BUFS = _IOWR('V', 92, V4l2IoctlCreateBuffers)
+    PREPARE_BUF = _IOWR('V', 93, V4l2IoctlBuffer)
+    G_SELECTION = _IOWR('V', 94, V4l2IoctlSelection)
+    S_SELECTION = _IOWR('V', 95, V4l2IoctlSelection)
+    DECODER_CMD = _IOWR('V', 96, V4l2IoctlDecoderCmd)
+    TRY_DECODER_CMD = _IOWR('V', 97, V4l2IoctlDecoderCmd)
+    ENUM_DV_TIMINGS = _IOWR('V', 98, V4l2IoctlEnumDvTimings)
+    QUERY_DV_TIMINGS = _IOR('V', 99, V4l2IoctlDvTimings)
+    DV_TIMINGS_CAP = _IOWR('V', 100, V4l2IoctlDvTimingsCap)
+    ENUM_FREQ_BANDS = _IOWR('V', 101, V4l2IoctlFrequencyBand)
+    DBG_G_CHIP_INFO = _IOWR('V', 102, V4l2IoctlDbgChipInfo)
+    QUERY_EXT_CTRL = _IOWR('V', 103, V4l2IoctlQueryExtCtrl)
     """

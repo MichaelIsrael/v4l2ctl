@@ -35,7 +35,7 @@ def v4l2_fourcc_be(a, b, c, d):
 ###############################################################################
 # An abstrction for struct v4l2_fmtdesc from linux/videodev2.h
 ###############################################################################
-class V4l2FmtDesc(ctypes.Structure):
+class V4l2IoctlFmtDesc(ctypes.Structure):
     """An implementation of struct v4l2_fmtdesc (linux/videodev.h)
 
     Used to request the supported fomrats on a  V4L2 device (VIDIOC_ENUM_FMT).
