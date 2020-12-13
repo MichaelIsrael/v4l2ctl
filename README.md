@@ -12,7 +12,7 @@ v4l2ctl is a python package to control v4l2 drivers.
 # Status
 The project is still in its early development stages. It can, however, already
 be used to read the name, driver, version and capabilities of a v4l2 device
-driver.
+driver, and read the supported frame sizes and intervals..
 
 # Installation
 ```
@@ -21,6 +21,11 @@ pip install v4l2ctl
 
 # Documentation
 All documentation can be found [here](https://v4l2ctl.readthedocs.io/).
+
+# Testing
+There is a lot to be tested and inforunately, I don't have enough camera
+devices to test all features. If you find any bugs or problems, please don't
+hesitate to open an [issue](https://github.com/MichaelIsrael/v4l2ctl/issues).
 
 # Copyright and licence
 Copyright 2020, Michael Israel
