@@ -15,7 +15,8 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
-from .v4l2formats import V4l2IoctlFmtDesc
+from .v4l2formats import V4l2IoctlFmtDesc, V4l2IoctlFrameSizeEnum, \
+         V4l2IoctlFrameIvalEnum
 from enum import IntFlag, IntEnum
 from fcntl import ioctl
 import ctypes
@@ -300,7 +301,7 @@ class IoctlAbstraction(object):
 class VidIocOps(object):
     """Abstraction for ioctl operations on v4l2 devices.
     see LINUX_HEADERS/include/media/v4l2-ioctl.h: struct v4l2_ioctl_ops.
-    see include/videodev2.h
+    see uapi/include/videodev2.h
 
     Keyword Arguments:
         device (str): the video device file.
@@ -326,6 +327,22 @@ class VidIocOps(object):
         obj.enum_fmt = IoctlAbstraction(device, "EnumFmt", IoctlDirection.RW,
                                         'V', 2, V4l2IoctlFmtDesc)
 
+        # define VIDIOC_ENUM_FRAMESIZES _IOWR('V', 74, struct v4l2_frmsizeenum)
+        obj.enum_frame_sizes = IoctlAbstraction(device,
+                                                "EnumFrameSizes",
+                                                IoctlDirection.RW,
+                                                'V',
+                                                74,
+                                                V4l2IoctlFrameSizeEnum)
+
+        # define VIDIOC_ENUM_FRAMEINTERVALS \
+        #           _IOWR('V', 75, struct v4l2_frmivalenum)
+        obj.enum_frame_intervals = IoctlAbstraction(device,
+                                                    "EnumFrameIntervals",
+                                                    IoctlDirection.RW,
+                                                    'V',
+                                                    75,
+                                                    V4l2IoctlFrameIvalEnum)
         ###############################
         # End of supported callables. #
         ###############################
@@ -337,16 +354,29 @@ class VidIocOps(object):
     ###########################################################################
     def query_cap(self):
         """Interface to the ioctl code VIDIOC_QUERYCAP.
-        For more information see struct v4l2_capability in include/videodev2.h.
+        For more information see struct v4l2_capability in
+        uapi/include/videodev2.h.
         """
 
     def enum_fmt(self, index, type):
-        # TODO: FIX docstring.
-        """Interface to the ioctl code VIDIOC_QUERYCAP.
-        For more information see struct v4l2_capability in include/videodev2.h.
+        """Interface to the ioctl code VIDIOC_ENUM_FMT.
+        For more information see struct v4l2_fmtdesc in
+        uapi/include/videodev2.h.
         """
 
-    # TODO:
+    def enum_frame_sizes(self, index, pixel_format, width, height):
+        """Interface to the ioctl code VIDIOC_ENUM_FRAMESIZES.
+        For more information see struct v4l2_frmsizeenum in
+        uapi/include/videodev2.h.
+        """
+
+    def enum_frame_intervals(self, index, pixel_format):
+        """Interface to the ioctl code VIDIOC_ENUM_FRAMEINTERVALS.
+        For more information see struct v4l2_frmivalenum in
+        uapi/include/videodev2.h.
+        """
+
+    # TODO: To be implemented.
     """
     G_FMT = _IOWR('V',  4, V4l2IoctlFormat)
     S_FMT = _IOWR('V',  5, V4l2IoctlFormat)
@@ -403,8 +433,6 @@ class VidIocOps(object):
     G_EXT_CTRLS = _IOWR('V', 71, V4l2IoctlExtControls)
     S_EXT_CTRLS = _IOWR('V', 72, V4l2IoctlExtControls)
     TRY_EXT_CTRLS = _IOWR('V', 73, V4l2IoctlExtControls)
-    ENUM_FRAMESIZES = _IOWR('V', 74, V4l2IoctlFrmsizeenum)
-    ENUM_FRAMEINTERVALS = _IOWR('V', 75, V4l2IoctlFrmivalenum)
     G_ENC_INDEX = _IOR('V', 76, V4l2IoctlEncIdx)
     ENCODER_CMD = _IOWR('V', 77, V4l2IoctlEncoderCmd)
     TRY_ENCODER_CMD = _IOWR('V', 78, V4l2IoctlEncoderCmd)

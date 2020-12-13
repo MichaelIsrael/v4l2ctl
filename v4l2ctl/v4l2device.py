@@ -16,20 +16,58 @@
 ###############################################################################
 from .v4l2interface import VidIocOps, V4l2Capabilities
 from .v4l2formats import V4l2Formats, V4l2FormatDescFlags
-from collections import namedtuple
+from .v4l2frame import V4l2FrameSize
 from pathlib import Path
 
 
-V4l2Format = namedtuple("V4l2Format", ["format", "description", "flags"])
-V4l2Format.__doc__ = "The v4l2 format information."
-V4l2Format.format.__doc__ = "The format type (see :class:`V4l2Formats`)."
-V4l2Format.description.__doc__ = "The format description."
-V4l2Format.flags.__doc__ = ("The format flags (see " +
-                            ":class:`V4l2FormatDescFlags`).")
+class V4l2Format(object):
+    """The v4l2 format information."""
+    def __init__(self, ioc_ops, fmt_desc):
+        self._ioc_ops = ioc_ops
+        self._fmt_desc = fmt_desc
+
+    @property
+    def format(self):
+        "The format type (see :class:`V4l2Formats`)."
+        return V4l2Formats(self._fmt_desc.pixelformat)
+
+    @property
+    def description(self):
+        "The format description."
+        return self._fmt_desc.description.decode()
+
+    @property
+    def flags(self):
+        "The format flags (see :class:`V4l2FormatDescFlags`)."
+        return V4l2FormatDescFlags(self._fmt_desc.flags)
+
+    def sizes(self):
+        """A generator function that yiels the available sizes for this
+        format."""
+        fr_idx = 0
+        while fr_idx < 2**32:
+            try:
+                frm_size = self._ioc_ops.enum_frame_sizes(
+                    index=fr_idx,
+                    pixel_format=self._fmt_desc.pixelformat)
+            except OSError:
+                break
+            else:
+                yield V4l2FrameSize(self._ioc_ops, frm_size)
+            fr_idx += 1
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return ("V4l2Format(format={fmt}, description={desc}, flags={flgs})"
+                ).format(fmt=self.format.name,
+                         desc=self.description,
+                         flgs=self.flags)
 
 
 class V4l2Device(object):
-    """Initialize the VideoDevice object and read its basic information.
+    """Initialize the V4l2Device object and read its basic information.
 
     Keyword arguments:
         device (str, path-like, int): the video device (default r"/dev/video0")
@@ -55,10 +93,10 @@ class V4l2Device(object):
         self._name = caps.card.decode()
         self._bus = caps.bus_info.decode()
         # Decode kernel version.
-        self._version = "{}.{}.{}".format((caps.version & 0xFF0000) >> 16,
-                                          (caps.version & 0x00FF00) >> 8,
-                                          (caps.version & 0x0000FF)
-                                          )
+        self._version = ((caps.version & 0xFF0000) >> 16,
+                         (caps.version & 0x00FF00) >> 8,
+                         (caps.version & 0x0000FF),
+                         )
         # General physical capabilities.
         self._physical_caps = V4l2Capabilities(caps.capabilities)
         # If the device has device-specific capabilities store them
@@ -90,7 +128,12 @@ class V4l2Device(object):
 
     @property
     def version(self):
-        """The kernel version (read-only)."""
+        """The kernel version as a string (read-only)."""
+        return "{}.{}.{}".format(*self._version)
+
+    @property
+    def version_tuple(self):
+        """The kernel version as a tuple (read-only)."""
         return self._version
 
     @property
@@ -112,7 +155,7 @@ class V4l2Device(object):
 
     @staticmethod
     def iter_devices(skip_links=True):
-        """Return an iterator over all v4l2 devices available.
+        """Return an iterator over the available v4l2 devices.
 
         Keyword arguments:
             skip_links (bool): skip links and return every device only once
@@ -145,11 +188,8 @@ class V4l2Device(object):
             except OSError:
                 break
             else:
-                yield V4l2Format(V4l2Formats(fmt_desc.pixelformat),
-                                 fmt_desc.description.decode(),
-                                 V4l2FormatDescFlags(fmt_desc.flags),
-                                 )
-                idx += 1
+                yield V4l2Format(self._ioc_ops, fmt_desc)
+            idx += 1
 
 
 class V4l2DeviceIterator(object):

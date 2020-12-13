@@ -556,3 +556,186 @@ class V4l2FormatDescFlags(IntFlag):
     #: (usually libv4l2), where possible try to use a native format instead
     #: for better performance.
     EMULATED = 0x0002
+    CONTINUOUS_BYTESTREAM = 0x0004
+    DYNAMIC_RESOLUTION = 0x0008
+
+
+###############################################################################
+#                   Frame Size and frame rate enumeration.
+###############################################################################
+
+###############################################################################
+#
+#       F R A M E   S I Z E   E N U M E R A T I O N
+#
+###############################################################################
+class V4l2FrameSizeTypes(IntEnum):
+    DISCRETE = 1,
+    CONTINUOUS = 2,
+    STEPWISE = 3,
+
+
+class V4l2FrameSizeDiscrete(ctypes.Structure):
+    _fields_ = [
+        ('width', ctypes.c_uint32),
+        ('height', ctypes.c_uint32),
+    ]
+
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Frame width [pixel].
+    width = None
+    #: Frame height [pixel].
+    height = None
+
+
+class V4l2FrameSizeStepwise(ctypes.Structure):
+    _fields_ = [
+        ('min_width', ctypes.c_uint32),
+        ('max_width', ctypes.c_uint32),
+        ('step_width', ctypes.c_uint32),
+        ('min_height', ctypes.c_uint32),
+        ('max_height', ctypes.c_uint32),
+        ('step_height', ctypes.c_uint32),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Minimum frame width [pixel].
+    min_width = None
+    #: Maximum frame width [pixel].
+    max_width = None
+    #: Frame width step size [pixel].
+    step_width = None
+    #: Minimum frame height [pixel].
+    min_height = None
+    #: Maximum frame height [pixel].
+    max_height = None
+    #: Frame height step size [pixel].
+    step_height = None
+
+
+# Frame size
+class _FrameSizeUnion(ctypes.Union):
+    _fields_ = [
+        ('discrete', V4l2FrameSizeDiscrete),
+        ('stepwise', V4l2FrameSizeStepwise),
+        ]
+
+
+class V4l2IoctlFrameSizeEnum(ctypes.Structure):
+    _anonymous_ = ("_",)
+    _fields_ = [
+        ('index', ctypes.c_uint32),
+        ('pixel_format', ctypes.c_uint32),
+        ('type', ctypes.c_uint32),
+        ('_', _FrameSizeUnion),
+        ('reserved', ctypes.c_uint32 * 2),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Frame size number.
+    index = None
+    #: Pixel format.
+    pixel_format = None
+    #: Frame size type the device supports.
+    type = None
+    #: Frame size (discrete).
+    discrete = None
+    #: Frame size (stepwise).
+    stepwise = None
+    #: Reserved space for future use.
+    reserved = None
+
+
+###############################################################################
+#       F R A M E   R A T E   E N U M E R A T I O N
+###############################################################################
+class V4l2FrameIvalTypes(IntEnum):
+    DISCRETE = 1
+    CONTINUOUS = 2
+    STEPWISE = 3
+
+
+class V4l2Fraction(ctypes.Structure):
+    _fields_ = [
+        ('numerator', ctypes.c_uint32),
+        ('denominator', ctypes.c_uint32),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Numerator.
+    numerator = None
+    #: Denominator.
+    denominator = None
+
+
+class V4l2FrameIvalStepwise(ctypes.Structure):
+    _fields_ = [
+        ('min', V4l2Fraction),
+        ('max', V4l2Fraction),
+        ('step', V4l2Fraction),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Minimum frame interval [s].
+    min = None
+    #: Maximum frame interval [s].
+    max = None
+    #: Frame interval step size [s].
+    step = None
+
+
+class _FrameIntervalUnion(ctypes.Union):
+    _fields_ = [
+        ('discrete', V4l2Fraction),
+        ('stepwise', V4l2FrameIvalStepwise),
+        ]
+
+
+class V4l2IoctlFrameIvalEnum(ctypes.Structure):
+    _anonymous_ = ("_",)
+    _fields_ = [
+        ('index', ctypes.c_uint32),
+        ('pixel_format', ctypes.c_uint32),
+        ('width', ctypes.c_uint32),
+        ('height', ctypes.c_uint32),
+        ('type', ctypes.c_uint32),
+        ('_', _FrameIntervalUnion),
+        ('reserved', ctypes.c_uint32 * 2),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Frame format index */
+    index = None
+    #: Pixel format */
+    pixel_format = None
+    #: Frame width */
+    width = None
+    #: Frame height */
+    height = None
+    #: Frame interval type the device supports. */
+    type = None
+    #: Frame interval (discrete).
+    discrete = None
+    #: Frame interval (stepwise).
+    stepwise = None
+    #: Reserved space for future use */
+    reserved = None
