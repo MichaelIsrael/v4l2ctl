@@ -14,7 +14,7 @@
 # See the Licence for the specific language governing permissions and
 # limitations under the Licence.
 ###############################################################################
-from fractions import Fraction
+from .v4l2types import V4l2Fraction
 from .v4l2formats import V4l2Formats, V4l2FrameSizeTypes, V4l2FrameIvalTypes
 from abc import ABC, abstractmethod
 
@@ -34,20 +34,16 @@ class V4l2FrameInterval(object):
         """The frame interval.
 
         Note:
-            In case of a discrete interval, this is a Fraction.
+            In case of a discrete interval, this is a V4l2Fraction.
             In case of a stepwise or coninuous interval, this is a tuple of
             fractions of the form (min, max, step).
         """
         if self.type == V4l2FrameIvalTypes.DISCRETE:
-            return Fraction(self._frame_ival.discrete.numerator,
-                            self._frame_ival.discrete.denominator)
+            return V4l2Fraction(self._frame_ival.discrete)
         else:
-            return (Fraction(self._frame_ival.stepwise.min.numerator,
-                             self._frame_ival.stepwise.min.denominator),
-                    Fraction(self._frame_ival.stepwise.max.numerator,
-                             self._frame_ival.stepwise.max.denominator),
-                    Fraction(self._frame_ival.stepwise.step.numerator,
-                             self._frame_ival.stepwise.step.denominator),
+            return (V4l2Fraction(self._frame_ival.stepwise.min),
+                    V4l2Fraction(self._frame_ival.stepwise.max),
+                    V4l2Fraction(self._frame_ival.stepwise.step),
                     )
 
     def __repr__(self):
@@ -128,12 +124,12 @@ class V4l2DiscreteFrameSize(V4l2FrameSize):
     """The v4l2 discrete frame size."""
     @property
     def width(self):
-        """Return the width of the frame."""
+        """The frame width."""
         return self._frame_size.discrete.width
 
     @property
     def height(self):
-        """Return the height of the frame."""
+        """The frame height."""
         return self._frame_size.discrete.height
 
     def intervals(self):
