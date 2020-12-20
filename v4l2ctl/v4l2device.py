@@ -238,20 +238,30 @@ class V4l2Device(object):
 
     @property
     def formats(self):
+        """A generator for the suported formats by this video device.
+
+        Note:
+            The formats are specfic to the set buffer type. (See
+            :py:attr:`~buffer_type`)
+        """
         return self.iter_buffer_formats(self.buffer_type)
 
     @property
     def supported_buffer_types(self):
+        """The supported buffer types by this video device (read-only)."""
         return self._supported_buffer_types
 
     @property
     def buffer_type(self):
+        """The buffer type (see :class:`V4l2BufferType`) required for several
+        operations. This attribute does not change anything in the device
+        itself. It is used by other operations.
+        """
         return self._buffer_type
 
     @buffer_type.setter
     def buffer_type(self, buffer_type):
-        # Make sure only one valid buffer type was used.
-        # if V4l2BufferType(buffer_type).name is None:
+        """Setter for buffer_type."""
         if V4l2BufferType(buffer_type) not in self.supported_buffer_types:
             raise ValueError("This device supports only the following buffer" +
                              " types: " + str([b.name for b in
@@ -260,6 +270,12 @@ class V4l2Device(object):
 
     @property
     def cropping_rectangle(self):
+        """The cropping rectangle (see :class:`V4l2Rectangle`).
+
+        Note:
+            The cropping rectange is specfic to the set buffer type. (See
+            :py:attr:`~buffer_type`)
+        """
         try:
             cropping = self._ioc_ops.get_crop(type=self._buffer_type)
         except IoctlError as e:
@@ -272,6 +288,7 @@ class V4l2Device(object):
 
     @cropping_rectangle.setter
     def cropping_rectangle(self, rectangle):
+        """Setter for cropping_rectangle."""
         try:
             self._ioc_ops.set_crop(type=self._buffer_type,
                                    c=rectangle._to_v4l2())

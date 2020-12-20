@@ -26,12 +26,14 @@ class V4l2FrameInterval(object):
 
     @property
     def type(self):
-        "The frame interval type (see :class:`V4l2FrameIvalTypes`)."
+        """The frame interval type (see :class:`V4l2FrameIvalTypes`)
+        (read-only).
+        """
         return V4l2FrameIvalTypes(self._frame_ival.type)
 
     @property
     def interval(self):
-        """The frame interval.
+        """The frame interval (read-only).
 
         Note:
             In case of a discrete interval, this is a V4l2Fraction.
@@ -73,12 +75,12 @@ class V4l2FrameSize(ABC):
 
     @property
     def format(self):
-        "The format type (see :class:`V4l2Formats`)."
+        "The format type (see :class:`V4l2Formats`) (read-only)."
         return V4l2Formats(self._frame_size.pixel_format)
 
     @property
     def type(self):
-        "The frame size type (see :class:`V4l2FrameSizeTypes`)."
+        "The frame size type (see :class:`V4l2FrameSizeTypes`) (read-only)."
         return V4l2FrameSizeTypes(self._frame_size.type)
 
     def __repr__(self):
@@ -98,7 +100,7 @@ class V4l2FrameSize(ABC):
     @property
     @abstractmethod
     def width(self):
-        """The frame width.
+        """The frame width (read-only).
 
         Note:
             In case of a discrete size, this is an integral value.
@@ -110,7 +112,7 @@ class V4l2FrameSize(ABC):
     @property
     @abstractmethod
     def height(self):
-        """The frame height.
+        """The frame height (read-only).
 
         Note:
             In case of a discrete size, this is an integral value.
@@ -124,12 +126,12 @@ class V4l2DiscreteFrameSize(V4l2FrameSize):
     """The v4l2 discrete frame size."""
     @property
     def width(self):
-        """The frame width."""
+        """The frame width (read-only)."""
         return self._frame_size.discrete.width
 
     @property
     def height(self):
-        """The frame height."""
+        """The frame height (read-only)."""
         return self._frame_size.discrete.height
 
     def intervals(self):
@@ -155,14 +157,14 @@ class V4l2StepwiseFrameSize(V4l2FrameSize):
     """The v4l2 stepwise/continuous frame size."""
     @property
     def width(self):
-        """The frame width as a tuple of the form (min, max, step)."""
+        "The frame width as a tuple of the form (min, max, step) (read-only)."
         return (self._frame_size.stepwise.min_width,
                 self._frame_size.stepwise.max_width,
                 self._frame_size.stepwise.step_width)
 
     @property
     def height(self):
-        """The frame height as a tuple of the form (min, max, step)."""
+        "The frame height as a tuple of the form (min, max, step) (read-only)."
         return (self._frame_size.stepwise.min_height,
                 self._frame_size.stepwise.max_height,
                 self._frame_size.stepwise.step_height)
