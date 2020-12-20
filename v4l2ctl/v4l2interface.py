@@ -15,8 +15,11 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
-from .v4l2formats import V4l2IoctlFmtDesc, V4l2IoctlFrameSizeEnum, \
-         V4l2IoctlFrameIvalEnum
+from .v4l2formats import V4l2IoctlFmtDesc, \
+                         V4l2IoctlFrameSizeEnum, \
+                         V4l2IoctlFrameIvalEnum, \
+                         V4l2IoctlCropCap, \
+                         V4l2IoctlCrop
 from enum import IntFlag, IntEnum
 from fcntl import ioctl
 import ctypes
@@ -27,17 +30,21 @@ import ctypes
 ###############################################################################
 class IoctlError(Exception):
     """Raised when ioctl() returns a non-zero value."""
-    def __init__(self, device, name, request, return_code):
+    def __init__(self, device, name, request, return_code, extra_msg=None):
         super().__init__()
         self._info = {"device": device,
                       "name": name,
                       "request": request,
                       "return_code": return_code,
                       }
+        self._extra_msg = extra_msg
 
     def __str__(self):
-        return("The ioctl request '{name}' ({request:#X}) on '{device}' "
+        msg = ("The ioctl request '{name}' ({request:#X}) on '{device}' "
                "returned '{return_code}'.").format(**self._info)
+        if self._extra_msg:
+            msg += ": " + self._extra_msg
+        return msg
 
 
 ###############################################################################
@@ -283,7 +290,30 @@ class IoctlAbstraction(object):
 
         # Run the ioctl request.
         with open(self._device, "rb") as dev_fd:
-            ret_code = ioctl(dev_fd, self._code, buff)
+            Timeout = 20
+            while Timeout > 0:
+                try:
+                    ret_code = ioctl(dev_fd, self._code, buff)
+                except OSError as e:
+                    if "Errno 4" in str(e):
+                        pass
+                    else:
+                        raise IoctlError(self._device,
+                                         self._name,
+                                         self._code,
+                                         -1,
+                                         str(e),
+                                         ) from None
+                else:
+                    break
+                Timeout -= 1
+            else:
+                raise IoctlError(self._device,
+                                 self._name,
+                                 self._code,
+                                 -1,
+                                 "Call was interrupted 20 times.",
+                                 )
 
         # I couldn't figure out a scenario where ret_code is none zero, because
         # so far an exception is always raised when there is an error with the
@@ -320,12 +350,48 @@ class VidIocOps(object):
         # Add real callables. #
         #######################
         # define VIDIOC_QUERYCAP _IOR('V',  0, struct v4l2_capability)
-        obj.query_cap = IoctlAbstraction(device, "QueryCap", IoctlDirection.R,
-                                         'V', 0, V4l2IoctlCapability)
+        obj.query_cap = IoctlAbstraction(device,
+                                         "QueryCap",
+                                         IoctlDirection.R,
+                                         'V',
+                                         0,
+                                         V4l2IoctlCapability)
 
         # define VIDIOC_ENUM_FMT _IOWR('V',  2, struct v4l2_fmtdesc)
-        obj.enum_fmt = IoctlAbstraction(device, "EnumFmt", IoctlDirection.RW,
-                                        'V', 2, V4l2IoctlFmtDesc)
+        obj.enum_fmt = IoctlAbstraction(device,
+                                        "EnumFmt",
+                                        IoctlDirection.RW,
+                                        'V',
+                                        2,
+                                        V4l2IoctlFmtDesc)
+
+        # define VIDIOC_G_FMT		_IOWR('V',  4, struct v4l2_format)
+        # define VIDIOC_S_FMT		_IOWR('V',  5, struct v4l2_format)
+        # define VIDIOC_TRY_FMT		_IOWR('V', 64, struct v4l2_format)
+
+        # define VIDIOC_CROPCAP		_IOWR('V', 58, struct v4l2_cropcap)
+        obj.crop_cap = IoctlAbstraction(device,
+                                        "CropCapabilities",
+                                        IoctlDirection.RW,
+                                        'V',
+                                        58,
+                                        V4l2IoctlCropCap)
+
+        # define VIDIOC_G_CROP		_IOWR('V', 59, struct v4l2_crop)
+        obj.get_crop = IoctlAbstraction(device,
+                                        "GetCropping",
+                                        IoctlDirection.RW,
+                                        'V',
+                                        59,
+                                        V4l2IoctlCrop)
+
+        # define VIDIOC_S_CROP		 _IOW('V', 60, struct v4l2_crop)
+        obj.set_crop = IoctlAbstraction(device,
+                                        "SetCropping",
+                                        IoctlDirection.W,
+                                        'V',
+                                        60,
+                                        V4l2IoctlCrop)
 
         # define VIDIOC_ENUM_FRAMESIZES _IOWR('V', 74, struct v4l2_frmsizeenum)
         obj.enum_frame_sizes = IoctlAbstraction(device,
@@ -343,6 +409,7 @@ class VidIocOps(object):
                                                     'V',
                                                     75,
                                                     V4l2IoctlFrameIvalEnum)
+
         ###############################
         # End of supported callables. #
         ###############################
@@ -354,24 +421,89 @@ class VidIocOps(object):
     ###########################################################################
     def query_cap(self):
         """Interface to the ioctl code VIDIOC_QUERYCAP.
+
+        Queries the capabilities of a video device.
+
         For more information see struct v4l2_capability in
         uapi/include/videodev2.h.
         """
 
     def enum_fmt(self, index, type):
         """Interface to the ioctl code VIDIOC_ENUM_FMT.
+
+        Enumerates the supported formats on a video device.
+
+        Keyword arguments:
+            index (int): the format index to read.
+            type (V4l2BufferType): the buffer type under inspection.
+
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.
         """
 
-    def enum_frame_sizes(self, index, pixel_format, width, height):
+    def crop_cap(self, type):
+        """Interface to the ioctl code VIDIOC_CROPCAP.
+
+        Queries the cropping capabilities of a video device.
+
+        Keyword arguments:
+            type (V4l2BufferType): the buffer type under inspection.
+
+        For more information see struct v4l2_fmtdesc in
+        uapi/include/videodev2.h.
+        """
+
+    def get_crop(self, type):
+        """Interface to the ioctl code VIDIOC_G_CROP.
+
+        Gets a cropping rectangle.
+
+        Keyword arguments:
+            type (V4l2BufferType): the buffer type under inspection.
+
+        For more information see struct v4l2_fmtdesc in
+        uapi/include/videodev2.h.
+        """
+
+    def set_crop(self, type, c):
+        """Interface to the ioctl code VIDIOC_S_CROP.
+
+        Sets a cropping rectangle.
+
+        Keyword arguments:
+            type (V4l2BufferType): the buffer type under inspection.
+            c (V4l2IoctlRectangle): the cropping rectangle to set.
+
+        For more information see struct v4l2_fmtdesc in
+        uapi/include/videodev2.h.
+        """
+
+    def enum_frame_sizes(self, index, pixel_format):
         """Interface to the ioctl code VIDIOC_ENUM_FRAMESIZES.
+
+        Enumerates the supported frame size for a certain format on a video
+        device.
+
+        Keyword arguments:
+            index (int): the frame size index to read.
+            pixel_format (V4l2Formats): the pixel format under inspection.
+
         For more information see struct v4l2_frmsizeenum in
         uapi/include/videodev2.h.
         """
 
-    def enum_frame_intervals(self, index, pixel_format):
+    def enum_frame_intervals(self, index, pixel_format, width, height):
         """Interface to the ioctl code VIDIOC_ENUM_FRAMEINTERVALS.
+
+        Enumerates the supported frame intervals for a certain format and frame
+        size on a video device.
+
+        Keyword arguments:
+            index (int): the frame interval index to read.
+            pixel_format (V4l2Formats): the pixel format under inspection.
+            width (int): the frame width under inspection.
+            height (int): the frame height under inspection.
+
         For more information see struct v4l2_frmivalenum in
         uapi/include/videodev2.h.
         """
@@ -417,9 +549,6 @@ class VidIocOps(object):
     S_MODULATOR = _IOW('V', 55, V4l2IoctlModulator)
     G_FREQUENCY = _IOWR('V', 56, V4l2IoctlFrequency)
     S_FREQUENCY = _IOW('V', 57, V4l2IoctlFrequency)
-    CROPCAP = _IOWR('V', 58, V4l2IoctlCropcap)
-    G_CROP = _IOWR('V', 59, V4l2IoctlCrop)
-    S_CROP = _IOW('V', 60, V4l2IoctlCrop)
     G_JPEGCOMP = _IOR('V', 61, V4l2IoctlJpegcompression)
     S_JPEGCOMP = _IOW('V', 62, V4l2IoctlJpegcompression)
     QUERYSTD = _IOR('V', 63, v4l2_std_id)

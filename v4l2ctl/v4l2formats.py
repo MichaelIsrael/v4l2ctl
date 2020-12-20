@@ -575,7 +575,7 @@ class V4l2FrameSizeTypes(IntEnum):
     STEPWISE = 3,
 
 
-class V4l2FrameSizeDiscrete(ctypes.Structure):
+class V4l2IoctlFrameSizeDiscrete(ctypes.Structure):
     _fields_ = [
         ('width', ctypes.c_uint32),
         ('height', ctypes.c_uint32),
@@ -592,7 +592,7 @@ class V4l2FrameSizeDiscrete(ctypes.Structure):
     height = None
 
 
-class V4l2FrameSizeStepwise(ctypes.Structure):
+class V4l2IoctlFrameSizeStepwise(ctypes.Structure):
     _fields_ = [
         ('min_width', ctypes.c_uint32),
         ('max_width', ctypes.c_uint32),
@@ -623,8 +623,8 @@ class V4l2FrameSizeStepwise(ctypes.Structure):
 # Frame size
 class _FrameSizeUnion(ctypes.Union):
     _fields_ = [
-        ('discrete', V4l2FrameSizeDiscrete),
-        ('stepwise', V4l2FrameSizeStepwise),
+        ('discrete', V4l2IoctlFrameSizeDiscrete),
+        ('stepwise', V4l2IoctlFrameSizeStepwise),
         ]
 
 
@@ -665,7 +665,7 @@ class V4l2FrameIvalTypes(IntEnum):
     STEPWISE = 3
 
 
-class V4l2Fraction(ctypes.Structure):
+class V4l2IoctlFraction(ctypes.Structure):
     _fields_ = [
         ('numerator', ctypes.c_uint32),
         ('denominator', ctypes.c_uint32),
@@ -681,11 +681,11 @@ class V4l2Fraction(ctypes.Structure):
     denominator = None
 
 
-class V4l2FrameIvalStepwise(ctypes.Structure):
+class V4l2IoctlFrameIvalStepwise(ctypes.Structure):
     _fields_ = [
-        ('min', V4l2Fraction),
-        ('max', V4l2Fraction),
-        ('step', V4l2Fraction),
+        ('min', V4l2IoctlFraction),
+        ('max', V4l2IoctlFraction),
+        ('step', V4l2IoctlFraction),
         ]
     ###########################################################################
     # These are the fields/attributes that will be automatically
@@ -702,8 +702,8 @@ class V4l2FrameIvalStepwise(ctypes.Structure):
 
 class _FrameIntervalUnion(ctypes.Union):
     _fields_ = [
-        ('discrete', V4l2Fraction),
-        ('stepwise', V4l2FrameIvalStepwise),
+        ('discrete', V4l2IoctlFraction),
+        ('stepwise', V4l2IoctlFrameIvalStepwise),
         ]
 
 
@@ -739,3 +739,69 @@ class V4l2IoctlFrameIvalEnum(ctypes.Structure):
     stepwise = None
     #: Reserved space for future use */
     reserved = None
+
+
+###############################################################################
+#       I N P U T   I M A G E   C R O P P I N G
+###############################################################################
+# An abstrction of struct v4l2_rect from linux/videodev2.h
+class V4l2IoctlRectangle(ctypes.Structure):
+    _fields_ = [
+        ('left', ctypes.c_int32),
+        ('top', ctypes.c_int32),
+        ('width', ctypes.c_uint32),
+        ('height', ctypes.c_uint32),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Left.
+    left = None
+    #: Right.
+    top = None
+    #: Width.
+    width = None
+    #: Height.
+    height = None
+
+
+# An abstrction of struct v4l2_cropcap from linux/videodev2.h
+class V4l2IoctlCropCap(ctypes.Structure):
+    _fields_ = [
+        ('type', ctypes.c_uint32),
+        ('bounds', V4l2IoctlRectangle),
+        ('defrect', V4l2IoctlRectangle),
+        ('pixelaspect', V4l2IoctlFraction),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: enum v4l2_buf_type TODO
+    type = None
+    #: struct v4l2_rect TODO
+    bounds = None
+    #: struct v4l2_rect TODO
+    defrect = None
+    #: struct v4l2_rect TODO
+    pixelaspect = None
+
+
+# An abstrction of struct v4l2_crop from linux/videodev2.h
+class V4l2IoctlCrop(ctypes.Structure):
+    _fields_ = [
+        ('type', ctypes.c_uint32),
+        ('c', V4l2IoctlRectangle),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: enum v4l2_buf_type TODO
+    type = None
+    #: struct v4l2_rect TODO
+    c = None

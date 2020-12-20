@@ -14,10 +14,16 @@
 # See the Licence for the specific language governing permissions and
 # limitations under the Licence.
 ###############################################################################
-from .v4l2interface import VidIocOps, V4l2Capabilities
+from .v4l2interface import VidIocOps, V4l2Capabilities, V4l2BufferType
+from .v4l2interface import IoctlError
 from .v4l2formats import V4l2Formats, V4l2FormatDescFlags
 from .v4l2frame import V4l2FrameSize
+from .v4l2types import V4l2Rectangle, V4l2CroppingCapabilities
 from pathlib import Path
+
+
+class FeatureNotSupported(Exception):
+    pass
 
 
 class V4l2Format(object):
@@ -77,6 +83,14 @@ class V4l2Device(object):
     Raises:
         OSError: if a non-video device file is given.
     """
+
+    cropping_buffer_types = [V4l2BufferType.VIDEO_CAPTURE,
+                             V4l2BufferType.VIDEO_CAPTURE_MPLANE,
+                             V4l2BufferType.VIDEO_OUTPUT,
+                             V4l2BufferType.VIDEO_OUTPUT_MPLANE,
+                             V4l2BufferType.VIDEO_OVERLAY,
+                             ]
+
     def __init__(self, device=r"/dev/video0"):
         if isinstance(device, int):
             device = Path(r"/dev/video{}".format(device))
@@ -105,6 +119,15 @@ class V4l2Device(object):
             self._device_caps = V4l2Capabilities(caps.device_caps)
         else:
             self._device_caps = self._physical_caps
+
+        # Find the supported buffer types.
+        self._supported_buffer_types = [buftype for buftype in V4l2BufferType
+                                        if V4l2Capabilities[buftype.name]
+                                        in self._device_caps]
+
+        print(self._supported_buffer_types)
+        # Use the first supported buffer type as default.
+        self._buffer_type = self._supported_buffer_types[0]
 
     @property
     def name(self):
@@ -153,6 +176,28 @@ class V4l2Device(object):
         """
         return self._physical_caps
 
+    @property
+    def cropping_capabilities(self):
+        """The cropping capabilities (read-only).
+        These are the cropping capabilities of this video device.
+
+        Only valid for these buffer types:
+            * V4l2BufferType.VIDEO_CAPTURE
+            * V4l2BufferType.VIDEO_CAPTURE_MPLANE
+            * V4l2BufferType.VIDEO_OUTPUT
+            * V4l2BufferType.VIDEO_OUTPUT_MPLANE
+            * V4l2BufferType.VIDEO_OVERLAY
+        """
+        if self.buffer_type not in self.cropping_buffer_types:
+            raise FeatureNotSupported(
+                "Cropping is not supported for " + str(self.buffer_type) +
+                ". Supported buffer types: " + str([b.name for b in
+                                                    self.cropping_buffer_types]
+                                                   ))
+        # Query cropping capabilities.
+        crop_caps = self._ioc_ops.crop_cap(type=self.buffer_type)
+        return V4l2CroppingCapabilities._from_v4l2(crop_caps)
+
     @staticmethod
     def iter_devices(skip_links=True):
         """Return an iterator over the available v4l2 devices.
@@ -175,7 +220,7 @@ class V4l2Device(object):
         """Iterate over the formats supported by a certain buffer.
 
         Keyword arguments:
-            buffer_type:
+            buffer_type: see :class:`V4l2BufferType`.
 
         Returns:
             a generator
@@ -190,6 +235,50 @@ class V4l2Device(object):
             else:
                 yield V4l2Format(self._ioc_ops, fmt_desc)
             idx += 1
+
+    @property
+    def formats(self):
+        return self.iter_buffer_formats(self.buffer_type)
+
+    @property
+    def supported_buffer_types(self):
+        return self._supported_buffer_types
+
+    @property
+    def buffer_type(self):
+        return self._buffer_type
+
+    @buffer_type.setter
+    def buffer_type(self, buffer_type):
+        # Make sure only one valid buffer type was used.
+        # if V4l2BufferType(buffer_type).name is None:
+        if V4l2BufferType(buffer_type) not in self.supported_buffer_types:
+            raise ValueError("This device supports only the following buffer" +
+                             " types: " + str([b.name for b in
+                                               self.supported_buffer_types]))
+        self._buffer_type = buffer_type
+
+    @property
+    def cropping_rectangle(self):
+        try:
+            cropping = self._ioc_ops.get_crop(type=self._buffer_type)
+        except IoctlError as e:
+            if "Errno 22" in str(e):
+                raise FeatureNotSupported("Cropping is not supported") \
+                    from None
+            else:
+                raise
+        return V4l2Rectangle._from_v4l2(cropping.c)
+
+    @cropping_rectangle.setter
+    def cropping_rectangle(self, rectangle):
+        try:
+            self._ioc_ops.set_crop(type=self._buffer_type,
+                                   c=rectangle._to_v4l2())
+        except IoctlError as e:
+            if "Errno 25" in str(e):
+                raise FeatureNotSupported("Cropping is not supported") \
+                    from None
 
 
 class V4l2DeviceIterator(object):
