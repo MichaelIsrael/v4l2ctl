@@ -115,7 +115,7 @@ class DeviceListTest(TestCase):
                 continue
             try:
                 V4l2Device(dev_file)
-            except OSError:
+            except Exception:
                 pass
             else:
                 manual_list.append(dev_file)
