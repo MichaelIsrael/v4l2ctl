@@ -472,7 +472,7 @@ class VidIocOps(object):
 
         Keyword arguments:
             type (V4l2BufferType): the buffer type under inspection.
-            c (V4l2IoctlRectangle): the cropping rectangle to set.
+            c (V4l2IoctlRect): the cropping rectangle to set.
 
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.

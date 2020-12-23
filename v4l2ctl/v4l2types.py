@@ -16,7 +16,7 @@
 ###############################################################################
 from fractions import Fraction
 from dataclasses import dataclass
-from .v4l2formats import V4l2IoctlRectangle
+from .v4l2formats import V4l2IoctlRect
 
 
 class V4l2Fraction(Fraction):
@@ -49,7 +49,7 @@ class V4l2Rectangle:
                    )
 
     def _to_v4l2(self):
-        return V4l2IoctlRectangle(
+        return V4l2IoctlRect(
                    left=self.left,
                    top=self.top,
                    width=self.area.width,
