@@ -1,5 +1,9 @@
 # v4l2ctl change log
 
+## 0.1a3
+* Reading supported frame sizes.
+* Reading supported frame intervals.
+
 ## 0.1a2
 * First (internal) support for write ioctls.
 * Getting a list of available v4l2 devices.
