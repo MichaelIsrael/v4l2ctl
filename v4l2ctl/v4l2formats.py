@@ -33,10 +33,52 @@ def v4l2_fourcc_be(a, b, c, d):
 
 
 ###############################################################################
-# An abstrction for struct v4l2_fmtdesc from linux/videodev2.h
+# Basic abstractions.
+###############################################################################
+class V4l2IoctlFract(ctypes.Structure):
+    _fields_ = [
+        ('numerator', ctypes.c_uint32),
+        ('denominator', ctypes.c_uint32),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Numerator.
+    numerator = None
+    #: Denominator.
+    denominator = None
+
+
+class V4l2IoctlRect(ctypes.Structure):
+    """Implementation of struct v4l2_rect from uapi/linux/videodev2.h"""
+    _fields_ = [
+        ('left', ctypes.c_int32),
+        ('top', ctypes.c_int32),
+        ('width', ctypes.c_uint32),
+        ('height', ctypes.c_uint32),
+        ]
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Left.
+    left = None
+    #: Top.
+    top = None
+    #: Width.
+    width = None
+    #: Height.
+    height = None
+
+
+###############################################################################
+# Implementation for struct v4l2_fmtdesc from uapi/linux/videodev2.h
 ###############################################################################
 class V4l2IoctlFmtDesc(ctypes.Structure):
-    """An implementation of struct v4l2_fmtdesc (linux/videodev.h)
+    """An implementation of struct v4l2_fmtdesc (uapi/linux/videodev.h)
 
     Used to request the supported fomrats on a  V4L2 device (VIDIOC_ENUM_FMT).
 
@@ -665,27 +707,11 @@ class V4l2FrameIvalTypes(IntEnum):
     STEPWISE = 3
 
 
-class V4l2IoctlFraction(ctypes.Structure):
-    _fields_ = [
-        ('numerator', ctypes.c_uint32),
-        ('denominator', ctypes.c_uint32),
-        ]
-    ###########################################################################
-    # These are the fields/attributes that will be automatically
-    # created/overwritten in this class. Provided here for documentation
-    # purposes only.
-    ###########################################################################
-    #: Numerator.
-    numerator = None
-    #: Denominator.
-    denominator = None
-
-
 class V4l2IoctlFrameIvalStepwise(ctypes.Structure):
     _fields_ = [
-        ('min', V4l2IoctlFraction),
-        ('max', V4l2IoctlFraction),
-        ('step', V4l2IoctlFraction),
+        ('min', V4l2IoctlFract),
+        ('max', V4l2IoctlFract),
+        ('step', V4l2IoctlFract),
         ]
     ###########################################################################
     # These are the fields/attributes that will be automatically
@@ -702,7 +728,7 @@ class V4l2IoctlFrameIvalStepwise(ctypes.Structure):
 
 class _FrameIntervalUnion(ctypes.Union):
     _fields_ = [
-        ('discrete', V4l2IoctlFraction),
+        ('discrete', V4l2IoctlFract),
         ('stepwise', V4l2IoctlFrameIvalStepwise),
         ]
 
@@ -744,36 +770,13 @@ class V4l2IoctlFrameIvalEnum(ctypes.Structure):
 ###############################################################################
 #       I N P U T   I M A G E   C R O P P I N G
 ###############################################################################
-# An abstrction of struct v4l2_rect from linux/videodev2.h
-class V4l2IoctlRectangle(ctypes.Structure):
-    _fields_ = [
-        ('left', ctypes.c_int32),
-        ('top', ctypes.c_int32),
-        ('width', ctypes.c_uint32),
-        ('height', ctypes.c_uint32),
-        ]
-    ###########################################################################
-    # These are the fields/attributes that will be automatically
-    # created/overwritten in this class. Provided here for documentation
-    # purposes only.
-    ###########################################################################
-    #: Left.
-    left = None
-    #: Right.
-    top = None
-    #: Width.
-    width = None
-    #: Height.
-    height = None
-
-
-# An abstrction of struct v4l2_cropcap from linux/videodev2.h
+# Implementation of struct v4l2_cropcap from uapi/linux/videodev2.h
 class V4l2IoctlCropCap(ctypes.Structure):
     _fields_ = [
         ('type', ctypes.c_uint32),
-        ('bounds', V4l2IoctlRectangle),
-        ('defrect', V4l2IoctlRectangle),
-        ('pixelaspect', V4l2IoctlFraction),
+        ('bounds', V4l2IoctlRect),
+        ('defrect', V4l2IoctlRect),
+        ('pixelaspect', V4l2IoctlFract),
         ]
     ###########################################################################
     # These are the fields/attributes that will be automatically
@@ -790,11 +793,11 @@ class V4l2IoctlCropCap(ctypes.Structure):
     pixelaspect = None
 
 
-# An abstrction of struct v4l2_crop from linux/videodev2.h
+# Implementation of struct v4l2_crop from uapi/linux/videodev2.h
 class V4l2IoctlCrop(ctypes.Structure):
     _fields_ = [
         ('type', ctypes.c_uint32),
-        ('c', V4l2IoctlRectangle),
+        ('c', V4l2IoctlRect),
         ]
     ###########################################################################
     # These are the fields/attributes that will be automatically
