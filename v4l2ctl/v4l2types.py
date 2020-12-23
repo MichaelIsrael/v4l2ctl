@@ -16,7 +16,7 @@
 ###############################################################################
 from fractions import Fraction
 from dataclasses import dataclass
-from .v4l2formats import V4l2IoctlRect
+from .ioctls.v4l2ioctlstructs import V4l2IoctlRect
 
 
 class V4l2Fraction(Fraction):

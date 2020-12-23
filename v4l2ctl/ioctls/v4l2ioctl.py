@@ -15,11 +15,11 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
-from .v4l2formats import V4l2IoctlFmtDesc, \
-                         V4l2IoctlFrameSizeEnum, \
-                         V4l2IoctlFrameIvalEnum, \
-                         V4l2IoctlCropCap, \
-                         V4l2IoctlCrop
+from .v4l2ioctlstructs import V4l2IoctlFmtDesc, \
+                              V4l2IoctlFrameSizeEnum, \
+                              V4l2IoctlFrameIvalEnum, \
+                              V4l2IoctlCropCap, \
+                              V4l2IoctlCrop
 from enum import IntFlag, IntEnum
 from fcntl import ioctl
 import ctypes
@@ -328,7 +328,7 @@ class IoctlAbstraction(object):
 ###############################################################################
 # An abstraction for supported ioctl operations on V4L2 devices.
 ###############################################################################
-class VidIocOps(object):
+class V4l2IocOps(object):
     """Abstraction for ioctl operations on v4l2 devices.
     see LINUX_HEADERS/include/media/v4l2-ioctl.h: struct v4l2_ioctl_ops.
     see uapi/include/videodev2.h

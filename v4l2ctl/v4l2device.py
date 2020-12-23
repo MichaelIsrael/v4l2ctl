@@ -14,9 +14,8 @@
 # See the Licence for the specific language governing permissions and
 # limitations under the Licence.
 ###############################################################################
-from .v4l2interface import VidIocOps, V4l2Capabilities, V4l2BufferType
-from .v4l2interface import IoctlError
-from .v4l2formats import V4l2Formats, V4l2FormatDescFlags
+from .ioctls import V4l2IocOps, V4l2Capabilities, V4l2BufferType, IoctlError, \
+                    V4l2Formats, V4l2FormatDescFlags
 from .v4l2frame import V4l2FrameSize
 from .v4l2types import V4l2Rectangle, V4l2CroppingCapabilities
 from pathlib import Path
@@ -97,8 +96,8 @@ class V4l2Device(object):
 
         self._device = device
 
-        # Create VidIocOps object for the ioctl operations.
-        self._ioc_ops = VidIocOps(self._device)
+        # Create V4l2IocOps object for the ioctl operations.
+        self._ioc_ops = V4l2IocOps(self._device)
 
         # Query capabilities and basic information
         caps = self._ioc_ops.query_cap()
@@ -125,7 +124,6 @@ class V4l2Device(object):
                                         if V4l2Capabilities[buftype.name]
                                         in self._device_caps]
 
-        print(self._supported_buffer_types)
         # Use the first supported buffer type as default.
         self._buffer_type = self._supported_buffer_types[0]
 

@@ -15,7 +15,7 @@
 # limitations under the Licence.
 ###############################################################################
 from .v4l2types import V4l2Fraction
-from .v4l2formats import V4l2Formats, V4l2FrameSizeTypes, V4l2FrameIvalTypes
+from .ioctls import V4l2Formats, V4l2FrameSizeTypes, V4l2FrameIvalTypes
 from abc import ABC, abstractmethod
 
 
