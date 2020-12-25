@@ -505,6 +505,14 @@ class V4l2Formats(IntEnum):
     META_FMT_VIVID = v4l2_fourcc('V', 'I', 'V', 'D')
 
 
+class V4l2PixFormatFlags(IntFlag):
+    #: The color values are premultiplied by the alpha channel value. E.g., if
+    #: a light blue pixel with 50% transparency was described by RGBA values
+    #: (128, 192, 255, 128), the same pixel described with premultiplied colors
+    #: would be described by RGBA values (64, 96, 128, 128)
+    PREMULTIPLIED_ALPHA = 0x00000001
+
+
 class V4l2FormatDescFlags(IntFlag):
     """The v4l2 format flags."""
     #: No flags are set.
@@ -520,12 +528,175 @@ class V4l2FormatDescFlags(IntFlag):
 
 
 class V4l2FrameSizeTypes(IntEnum):
-    DISCRETE = 1,
-    CONTINUOUS = 2,
-    STEPWISE = 3,
+    """The type of frame size."""
+    #: Discrete frame size.
+    DISCRETE = 1
+    #: Continuous frame size.
+    CONTINUOUS = 2
+    #: Step-wise defined frame size.
+    STEPWISE = 3
 
 
 class V4l2FrameIvalTypes(IntEnum):
+    """The type of frame interval."""
+    #: Discrete frame interval.
     DISCRETE = 1
+    #: Continuous frame interval.
     CONTINUOUS = 2
+    #: Step-wise defined frame interval.
     STEPWISE = 3
+
+
+class V4l2Field(IntEnum):
+    """The field order.
+    Implemntation of enum v4l2_field in uapi/include/videodev2.h
+    """
+    #: Applications request this field order when any field format is
+    #: acceptable. Drivers choose depending on hardware capabilities or e.g.
+    #: the requested image size, and return the actual field order. Drivers
+    #: must never return :py:attr:`V4l2Field.ANY`. If multiple field orders are
+    #: possible the driver must choose one of the possible field orders during
+    #: :py:meth:`V4l2IocOps.set_format` or :py:meth:`V4l2IocOps.try_format`.
+    #: :py:attr:`v4l2Buffer.field` can never be :py:attr:`V4l2Field.ANY`.
+    ANY = 0
+    #: Images are in progressive (frame-based) format, not interlaced
+    #: (field-based). (I.e., this device has no fields)
+    NONE = 1
+    #: Images consist of the top (aka odd) field only.
+    TOP = 2
+    #: Images consist of the bottom (aka even) field only. Applications may
+    #: wish to prevent a device from capturing interlaced images because they
+    #: will have “comb” or “feathering” artefacts around moving objects.
+    BOTTOM = 3
+    #: Images contain both fields, interleaved line by line. The temporal order
+    #: of the fields (whether the top or bottom field is older) depends on the
+    #: current video standard. In M/NTSC the bottom field is the older field.
+    #: In all other standards the top field is the older field.
+    INTERLACED = 4
+    #: Images contain both fields, the top field lines are stored first in
+    #: memory, immediately followed by the bottom field lines. Fields are
+    #: always stored in temporal order, the older one first in memory. Image
+    #: sizes refer to the frame, not fields.
+    SEQUENTIAL_TOP_BOTTOM = 5
+    #: Images contain both fields, the bottom field lines are stored first in
+    #: memory, immediately followed by the top field lines. Fields are always
+    #: stored in temporal order, the older one first in memory. Image sizes
+    #: refer to the frame, not fields.
+    SEQUENTIAL_BOTTOM_TOP = 6
+    #: The two fields of a frame are passed in separate buffers, in temporal
+    #: order, i. e. the older one first. To indicate the field parity (whether
+    #: the current field is a top or bottom field) the driver or application,
+    #: depending on data direction, must set :py:attr:`V4l2IoctlBuffer.field`
+    #: to :py:attr:`V4l2Field.TOP` or :py:attr:`V4l2Field.BOTTOM`. Any two
+    #: successive fields pair to build a frame. If fields are successive,
+    #: without any dropped fields between them (fields can drop individually),
+    #: can be determined from the :py:attr:`V4l2IoctlBuffer.sequence`. This
+    #: format cannot be selected when using the read/write I/O method since
+    #: there is no way to communicate if a field was a top or bottom field.
+    ALTERNATE = 7
+    #: Images contain both fields, interleaved line by line, top field first.
+    #: The top field is the older field.
+    INTERLACED_TOP_BOTTOM = 8
+    #: Images contain both fields, interleaved line by line, top field first.
+    #: The bottom field is the older field.
+    INTERLACED_BOTTOM_TOP = 9
+
+    def has_top(self):
+        """If the format has a top field.
+        Implemntation of the macro V4L2_FIELD_HAS_TOP(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.TOP or
+                self == V4l2Field.INTERLACED or
+                self == V4l2Field.INTERLACED_TOP_BOTTOM or
+                self == V4l2Field.INTERLACED_BOTTOM_TOP or
+                self == V4l2Field.SEQUENTIAL_TOP_BOTTOM or
+                self == V4l2Field.SEQUENTIAL_BOTTOM_TOP)
+
+    def has_bottom(self):
+        """If the format has a bottom field.
+        Implemntation of the macro V4L2_FIELD_HAS_BOTTOM(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.BOTTOM or
+                self == V4l2Field.INTERLACED or
+                self == V4l2Field.INTERLACED_TOP_BOTTOM or
+                self == V4l2Field.INTERLACED_BOTTOM_TOP or
+                self == V4l2Field.SEQUENTIAL_TOP_BOTTOM or
+                self == V4l2Field.SEQUENTIAL_BOTTOM_TOP)
+
+    def has_both(self):
+        """If the format has both top and bottom fields.
+        Implemntation of the macro V4L2_FIELD_HAS_BOTH(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.INTERLACED or
+                self == V4l2Field.INTERLACED_TOP_BOTTOM or
+                self == V4l2Field.INTERLACED_BOTTOM_TOP or
+                self == V4l2Field.SEQUENTIAL_TOP_BOTTOM or
+                self == V4l2Field.SEQUENTIAL_BOTTOM_TOP)
+
+    def has_top_or_bottom(self):
+        """If the format has either a top or bottom field.
+        Implemntation of the macro V4L2_FIELD_HAS_T_OR_B(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.BOTTOM or
+                self == V4l2Field.TOP or
+                self == V4l2Field.ALTERNATE)
+
+    def is_interlaced(self):
+        """If the format has interlaced fields.
+        Implemntation of the macro V4L2_FIELD_IS_INTERLACED(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.INTERLACED or
+                self == V4l2Field.INTERLACED_TOP_BOTTOM or
+                self == V4l2Field.INTERLACED_BOTTOM_TOP)
+
+    def is_sequential(self):
+        """If the format has sequential fields.
+        Implemntation of the macro V4L2_FIELD_IS_SEQUENTIAL(field) in
+        uapi/include/videodev2.h
+        """
+        return (self == V4l2Field.SEQUENTIAL_TOP_BOTTOM or
+                self == V4l2Field.SEQUENTIAL_BOTTOM_TOP)
+
+
+class V4l2ColorSpace(IntEnum):
+    """The color space.
+    Implemntation of enum v4l2_colorspace in uapi/include/videodev2.h
+    see also http://vektor.theorem.ca/graphics/ycbcr/
+    """
+    #: Default colorspace, i.e. let the driver figure it out.
+    #: Can only be used with video capture.
+    DEFAULT = 0
+    #: SMPTE 170M: used for broadcast NTSC/PAL SDTV.
+    SMPTE170M = 1
+    #: Obsolete pre-1998 SMPTE 240M HDTV standard, superseded by Rec 709.
+    SMPTE240M = 2
+    #: Rec.709: used for HDTV.
+    REC709 = 3
+    #: Deprecated, do not use. No driver will ever return this. This was
+    #: based on a misunderstanding of the bt878 datasheet.
+    BT878 = 4
+    #: NTSC 1953 colorspace. This only makes sense when dealing with
+    #: really, really old NTSC recordings. Superseded by SMPTE 170M.
+    _470_SYSTEM_M = 5
+    #: EBU Tech 3213 PAL/SECAM colorspace. This only makes sense when
+    #: dealing with really old PAL/SECAM recordings. Superseded by
+    #: SMPTE 170M.
+    _470_SYSTEM_BG = 6
+    #: Effectively shorthand for V4L2_COLORSPACE_SRGB, V4L2_YCBCR_ENC_601
+    #: and V4L2_QUANTIZATION_FULL_RANGE. To be used for (Motion-)JPEG.
+    JPEG = 7
+    #: For RGB colorspaces such as produces by most webcams.
+    SRGB = 8
+    #: opRGB colorspace.
+    OPRGB = 9
+    #: BT.2020 colorspace, used for UHDTV.
+    BT2020 = 10
+    #: Raw colorspace: for RAW unprocessed images.
+    RAW = 11
+    #: DCI-P3 colorspace, used by cinema projectors.
+    DCI_P3 = 12
