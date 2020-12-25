@@ -223,8 +223,7 @@ def write_structure(file_, struct, anonymous=False, parent_struct=None):
                                 type_suffix = "Struct"
                             else:
                                 raise Exception("Unexpected type!")
-                            d.type.type.name = "_" + py.name.removeprefix(
-                                "V4l2Ioctl") + type_suffix
+                            d.type.type.name = py.name + type_suffix
                             write_structure(file_,
                                             d.type.type,
                                             parent_struct=struct.name)
