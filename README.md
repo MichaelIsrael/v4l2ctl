@@ -23,7 +23,7 @@ pip install v4l2ctl
 All documentation can be found [here](https://v4l2ctl.readthedocs.io/).
 
 # Testing
-There is a lot to be tested and inforunately, I don't have enough camera
+There is a lot to be tested and unfortunately, I don't have enough camera
 devices to test all features. If you find any bugs or problems, please don't
 hesitate to open an [issue](https://github.com/MichaelIsrael/v4l2ctl/issues).
 
