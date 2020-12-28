@@ -60,6 +60,50 @@ class V4l2IoctlRect(ctypes.Structure):
 
 
 ###############################################################################
+# Implementation for struct v4l2_capability from uapi/linux/videodev2.h
+###############################################################################
+class V4l2IoctlCapability(ctypes.Structure):
+    """An implementation of struct v4l2_capability (uapi/linux/videodev.h)
+
+    Describes V4L2 device caps returned by VIDIOC_QUERYCAP
+
+    For the values of :attribute:`capabilities` and :attribute:`device_caps`,
+    see :class:`V4l2Capabilities`.
+
+    :meta private:
+    """
+    _fields_ = [
+        ('driver', ctypes.c_char * 16),
+        ('card', ctypes.c_char * 32),
+        ('bus_info', ctypes.c_char * 32),
+        ('version', ctypes.c_uint32),
+        ('capabilities', ctypes.c_uint32),
+        ('device_caps', ctypes.c_uint32),
+        ('reserved', ctypes.c_uint32 * 3),
+    ]
+
+    ###########################################################################
+    # These are the fields/attributes that will be automatically
+    # created/overwritten in this class. Provided here for documentation
+    # purposes only.
+    ###########################################################################
+    #: Name of the driver module (e.g. "bttv").
+    driver = None
+    #: Name of the card (e.g. "Hauppauge WinTV").
+    card = None
+    #: Name of the bus (e.g. "PCI" + pci_name(pci_dev) ).
+    bus_info = None
+    #: The driver version.
+    version = None
+    #: Capabilities of the physical device as a whole.
+    capabilities = None
+    #: Capabilities accessed via this particular device (node).
+    device_caps = None
+    #: Reserved for future extensions.
+    reserved = None
+
+
+###############################################################################
 # Implementation for struct v4l2_fmtdesc from uapi/linux/videodev2.h
 ###############################################################################
 class V4l2IoctlFmtDesc(ctypes.Structure):

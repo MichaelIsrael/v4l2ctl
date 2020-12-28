@@ -15,6 +15,7 @@
 # limitations under the Licence.
 ###############################################################################
 from enum import IntEnum, IntFlag
+from ..utils.enumcontainer import BaseEnumContainer
 
 
 ###############################################################################
@@ -31,478 +32,494 @@ def v4l2_fourcc_be(a, b, c, d):
     return (v4l2_fourcc(a, b, c, d) | (1 << 31))
 
 
-class V4l2Formats(IntEnum):
+class V4l2PixFormats(IntEnum):
     """An enumeration of all supported formats."""
     #: 8  RGB-3-3-2
-    PIX_FMT_RGB332 = v4l2_fourcc('R', 'G', 'B', '1')
+    RGB332 = v4l2_fourcc('R', 'G', 'B', '1')
     #: 16  xxxxrrrr g
-    PIX_FMT_RGB444 = v4l2_fourcc('R', '4', '4', '4')
+    RGB444 = v4l2_fourcc('R', '4', '4', '4')
     #: 16  aaaarrrr g
-    PIX_FMT_ARGB444 = v4l2_fourcc('A', 'R', '1', '2')
+    ARGB444 = v4l2_fourcc('A', 'R', '1', '2')
     #: 16  xxxxrrrr g
-    PIX_FMT_XRGB444 = v4l2_fourcc('X', 'R', '1', '2')
+    XRGB444 = v4l2_fourcc('X', 'R', '1', '2')
     #: 16  rrrrgggg b
-    PIX_FMT_RGBA444 = v4l2_fourcc('R', 'A', '1', '2')
+    RGBA444 = v4l2_fourcc('R', 'A', '1', '2')
     #: 16  rrrrgggg b
-    PIX_FMT_RGBX444 = v4l2_fourcc('R', 'X', '1', '2')
+    RGBX444 = v4l2_fourcc('R', 'X', '1', '2')
     #: 16  aaaabbbb g
-    PIX_FMT_ABGR444 = v4l2_fourcc('A', 'B', '1', '2')
+    ABGR444 = v4l2_fourcc('A', 'B', '1', '2')
     #: 16  xxxxbbbb g
-    PIX_FMT_XBGR444 = v4l2_fourcc('X', 'B', '1', '2')
+    XBGR444 = v4l2_fourcc('X', 'B', '1', '2')
 
     #########################################################################
     # Originally this had 'BA12' as fourcc, but this clashed with the older #
-    # V4L2_PIX_FMT_SGRBG12 which inexplicably used that same fourcc.        #
-    # So use 'GA12' instead for V4L2_PIX_FMT_BGRA444.                       #
+    # SGRBG12 which inexplicably used that same fourcc.                     #
+    # So use 'GA12' instead for BGRA444.                                    #
     #########################################################################
     #: 16  bbbbgggg r
-    PIX_FMT_BGRA444 = v4l2_fourcc('G', 'A', '1', '2')
+    BGRA444 = v4l2_fourcc('G', 'A', '1', '2')
     #: 16  bbbbgggg r
-    PIX_FMT_BGRX444 = v4l2_fourcc('B', 'X', '1', '2')
+    BGRX444 = v4l2_fourcc('B', 'X', '1', '2')
     #: 16  RGB-5-5-5
-    PIX_FMT_RGB555 = v4l2_fourcc('R', 'G', 'B', 'O')
+    RGB555 = v4l2_fourcc('R', 'G', 'B', 'O')
     #: 16  ARGB-1-5-5-5
-    PIX_FMT_ARGB555 = v4l2_fourcc('A', 'R', '1', '5')
+    ARGB555 = v4l2_fourcc('A', 'R', '1', '5')
     #: 16  XRGB-1-5-5-5
-    PIX_FMT_XRGB555 = v4l2_fourcc('X', 'R', '1', '5')
+    XRGB555 = v4l2_fourcc('X', 'R', '1', '5')
     #: 16  RGBA-5-5-5-1
-    PIX_FMT_RGBA555 = v4l2_fourcc('R', 'A', '1', '5')
+    RGBA555 = v4l2_fourcc('R', 'A', '1', '5')
     #: 16  RGBX-5-5-5-1
-    PIX_FMT_RGBX555 = v4l2_fourcc('R', 'X', '1', '5')
+    RGBX555 = v4l2_fourcc('R', 'X', '1', '5')
     #: 16  ABGR-1-5-5-5
-    PIX_FMT_ABGR555 = v4l2_fourcc('A', 'B', '1', '5')
+    ABGR555 = v4l2_fourcc('A', 'B', '1', '5')
     #: 16  XBGR-1-5-5-5
-    PIX_FMT_XBGR555 = v4l2_fourcc('X', 'B', '1', '5')
+    XBGR555 = v4l2_fourcc('X', 'B', '1', '5')
     #: 16  BGRA-5-5-5-1
-    PIX_FMT_BGRA555 = v4l2_fourcc('B', 'A', '1', '5')
+    BGRA555 = v4l2_fourcc('B', 'A', '1', '5')
     #: 16  BGRX-5-5-5-1
-    PIX_FMT_BGRX555 = v4l2_fourcc('B', 'X', '1', '5')
+    BGRX555 = v4l2_fourcc('B', 'X', '1', '5')
     #: 16  RGB-5-6-5
-    PIX_FMT_RGB565 = v4l2_fourcc('R', 'G', 'B', 'P')
+    RGB565 = v4l2_fourcc('R', 'G', 'B', 'P')
     #: 16  RGB-5-5-5 B
-    PIX_FMT_RGB555X = v4l2_fourcc('R', 'G', 'B', 'Q')
+    RGB555X = v4l2_fourcc('R', 'G', 'B', 'Q')
     #: 16  ARGB-5-5-5 B
-    PIX_FMT_ARGB555X = v4l2_fourcc_be('A', 'R', '1', '5')
+    ARGB555X = v4l2_fourcc_be('A', 'R', '1', '5')
     #: 16  XRGB-5-5-5 B
-    PIX_FMT_XRGB555X = v4l2_fourcc_be('X', 'R', '1', '5')
+    XRGB555X = v4l2_fourcc_be('X', 'R', '1', '5')
     #: 16  RGB-5-6-5 B
-    PIX_FMT_RGB565X = v4l2_fourcc('R', 'G', 'B', 'R')
+    RGB565X = v4l2_fourcc('R', 'G', 'B', 'R')
     #: 18  BGR-6-6-6
-    PIX_FMT_BGR666 = v4l2_fourcc('B', 'G', 'R', 'H')
+    BGR666 = v4l2_fourcc('B', 'G', 'R', 'H')
     #: 24  BGR-8-8-8
-    PIX_FMT_BGR24 = v4l2_fourcc('B', 'G', 'R', '3')
+    BGR24 = v4l2_fourcc('B', 'G', 'R', '3')
     #: 24  RGB-8-8-8
-    PIX_FMT_RGB24 = v4l2_fourcc('R', 'G', 'B', '3')
+    RGB24 = v4l2_fourcc('R', 'G', 'B', '3')
     #: 32  BGR-8-8-8-8
-    PIX_FMT_BGR32 = v4l2_fourcc('B', 'G', 'R', '4')
+    BGR32 = v4l2_fourcc('B', 'G', 'R', '4')
     #: 32  BGRA-8-8-8-8
-    PIX_FMT_ABGR32 = v4l2_fourcc('A', 'R', '2', '4')
+    ABGR32 = v4l2_fourcc('A', 'R', '2', '4')
     #: 32  BGRX-8-8-8-8
-    PIX_FMT_XBGR32 = v4l2_fourcc('X', 'R', '2', '4')
+    XBGR32 = v4l2_fourcc('X', 'R', '2', '4')
     #: 32  ABGR-8-8-8-8
-    PIX_FMT_BGRA32 = v4l2_fourcc('R', 'A', '2', '4')
+    BGRA32 = v4l2_fourcc('R', 'A', '2', '4')
     #: 32  XBGR-8-8-8-8
-    PIX_FMT_BGRX32 = v4l2_fourcc('R', 'X', '2', '4')
+    BGRX32 = v4l2_fourcc('R', 'X', '2', '4')
     #: 32  RGB-8-8-8-8
-    PIX_FMT_RGB32 = v4l2_fourcc('R', 'G', 'B', '4')
+    RGB32 = v4l2_fourcc('R', 'G', 'B', '4')
     #: 32  RGBA-8-8-8-8
-    PIX_FMT_RGBA32 = v4l2_fourcc('A', 'B', '2', '4')
+    RGBA32 = v4l2_fourcc('A', 'B', '2', '4')
     #: 32  RGBX-8-8-8-8
-    PIX_FMT_RGBX32 = v4l2_fourcc('X', 'B', '2', '4')
+    RGBX32 = v4l2_fourcc('X', 'B', '2', '4')
     #: 32  ARGB-8-8-8-8
-    PIX_FMT_ARGB32 = v4l2_fourcc('B', 'A', '2', '4')
+    ARGB32 = v4l2_fourcc('B', 'A', '2', '4')
     #: 32  XRGB-8-8-8-8
-    PIX_FMT_XRGB32 = v4l2_fourcc('B', 'X', '2', '4')
+    XRGB32 = v4l2_fourcc('B', 'X', '2', '4')
 
     #################
     # Grey formats. #
     #################
     #: 8  G
-    PIX_FMT_GREY = v4l2_fourcc('G', 'R', 'E', 'Y')
+    GREY = v4l2_fourcc('G', 'R', 'E', 'Y')
     #: 4  G
-    PIX_FMT_Y4 = v4l2_fourcc('Y', '0', '4', ' ')
+    Y4 = v4l2_fourcc('Y', '0', '4', ' ')
     #: 6  G
-    PIX_FMT_Y6 = v4l2_fourcc('Y', '0', '6', ' ')
+    Y6 = v4l2_fourcc('Y', '0', '6', ' ')
     #: 10  G
-    PIX_FMT_Y10 = v4l2_fourcc('Y', '1', '0', ' ')
+    Y10 = v4l2_fourcc('Y', '1', '0', ' ')
     #: 12  G
-    PIX_FMT_Y12 = v4l2_fourcc('Y', '1', '2', ' ')
+    Y12 = v4l2_fourcc('Y', '1', '2', ' ')
     #: 16  G
-    PIX_FMT_Y16 = v4l2_fourcc('Y', '1', '6', ' ')
+    Y16 = v4l2_fourcc('Y', '1', '6', ' ')
     #: 16  Greyscale B
-    PIX_FMT_Y16_BE = v4l2_fourcc_be('Y', '1', '6', ' ')
+    Y16_BE = v4l2_fourcc_be('Y', '1', '6', ' ')
 
     ############################
     # Grey bit-packed formats. #
     ############################
     #: 10  Greyscale bit-p
-    PIX_FMT_Y10BPACK = v4l2_fourcc('Y', '1', '0', 'B')
+    Y10BPACK = v4l2_fourcc('Y', '1', '0', 'B')
     #: 10  Greyscale, MIPI RAW10 p
-    PIX_FMT_Y10P = v4l2_fourcc('Y', '1', '0', 'P')
+    Y10P = v4l2_fourcc('Y', '1', '0', 'P')
 
     ####################
     # Palette formats. #
     ####################
     #: 8  8-bit p
-    PIX_FMT_PAL8 = v4l2_fourcc('P', 'A', 'L', '8')
+    PAL8 = v4l2_fourcc('P', 'A', 'L', '8')
 
     ########################
     # Chrominance formats. #
     ########################
     #: 8  UV 4:4
-    PIX_FMT_UV8 = v4l2_fourcc('U', 'V', '8', ' ')
+    UV8 = v4l2_fourcc('U', 'V', '8', ' ')
 
     ##################################
     # Luminance+Chrominance formats. #
     ##################################
     #: 16  YUV 4:2:2
-    PIX_FMT_YUYV = v4l2_fourcc('Y', 'U', 'Y', 'V')
+    YUYV = v4l2_fourcc('Y', 'U', 'Y', 'V')
     #: 16  YUV 4:2:2
-    PIX_FMT_YYUV = v4l2_fourcc('Y', 'Y', 'U', 'V')
+    YYUV = v4l2_fourcc('Y', 'Y', 'U', 'V')
     #: 16 YVU 4:2:2
-    PIX_FMT_YVYU = v4l2_fourcc('Y', 'V', 'Y', 'U')
+    YVYU = v4l2_fourcc('Y', 'V', 'Y', 'U')
     #: 16  YUV 4:2:2
-    PIX_FMT_UYVY = v4l2_fourcc('U', 'Y', 'V', 'Y')
+    UYVY = v4l2_fourcc('U', 'Y', 'V', 'Y')
     #: 16  YUV 4:2:2
-    PIX_FMT_VYUY = v4l2_fourcc('V', 'Y', 'U', 'Y')
+    VYUY = v4l2_fourcc('V', 'Y', 'U', 'Y')
     #: 12  YUV 4:1:1
-    PIX_FMT_Y41P = v4l2_fourcc('Y', '4', '1', 'P')
+    Y41P = v4l2_fourcc('Y', '4', '1', 'P')
     #: 16  xxxxyyyy u
-    PIX_FMT_YUV444 = v4l2_fourcc('Y', '4', '4', '4')
+    YUV444 = v4l2_fourcc('Y', '4', '4', '4')
     #: 16  YUV-5-5-5
-    PIX_FMT_YUV555 = v4l2_fourcc('Y', 'U', 'V', 'O')
+    YUV555 = v4l2_fourcc('Y', 'U', 'V', 'O')
     #: 16  YUV-5-6-5
-    PIX_FMT_YUV565 = v4l2_fourcc('Y', 'U', 'V', 'P')
+    YUV565 = v4l2_fourcc('Y', 'U', 'V', 'P')
     #: 32  YUV-8-8-8-8
-    PIX_FMT_YUV32 = v4l2_fourcc('Y', 'U', 'V', '4')
+    YUV32 = v4l2_fourcc('Y', 'U', 'V', '4')
     #: 32  AYUV-8-8-8-8
-    PIX_FMT_AYUV32 = v4l2_fourcc('A', 'Y', 'U', 'V')
+    AYUV32 = v4l2_fourcc('A', 'Y', 'U', 'V')
     #: 32  XYUV-8-8-8-8
-    PIX_FMT_XYUV32 = v4l2_fourcc('X', 'Y', 'U', 'V')
+    XYUV32 = v4l2_fourcc('X', 'Y', 'U', 'V')
     #: 32  VUYA-8-8-8-8
-    PIX_FMT_VUYA32 = v4l2_fourcc('V', 'U', 'Y', 'A')
+    VUYA32 = v4l2_fourcc('V', 'U', 'Y', 'A')
     #: 32  VUYX-8-8-8-8
-    PIX_FMT_VUYX32 = v4l2_fourcc('V', 'U', 'Y', 'X')
+    VUYX32 = v4l2_fourcc('V', 'U', 'Y', 'X')
     #: 8  8-bit c
-    PIX_FMT_HI240 = v4l2_fourcc('H', 'I', '2', '4')
+    HI240 = v4l2_fourcc('H', 'I', '2', '4')
     #: 8  YUV 4:2:0 16x16 m
-    PIX_FMT_HM12 = v4l2_fourcc('H', 'M', '1', '2')
+    HM12 = v4l2_fourcc('H', 'M', '1', '2')
     #: 12  YUV 4:2:0 2 lines y, 1 line uv i
-    PIX_FMT_M420 = v4l2_fourcc('M', '4', '2', '0')
+    M420 = v4l2_fourcc('M', '4', '2', '0')
 
     #################################################
     # two planes -- one Y, one Cr + Cb interleaved. #
     #################################################
     #: 12  Y/CbCr 4:2:0
-    PIX_FMT_NV12 = v4l2_fourcc('N', 'V', '1', '2')
+    NV12 = v4l2_fourcc('N', 'V', '1', '2')
     #: 12  Y/CrCb 4:2:0
-    PIX_FMT_NV21 = v4l2_fourcc('N', 'V', '2', '1')
+    NV21 = v4l2_fourcc('N', 'V', '2', '1')
     #: 16  Y/CbCr 4:2:2
-    PIX_FMT_NV16 = v4l2_fourcc('N', 'V', '1', '6')
+    NV16 = v4l2_fourcc('N', 'V', '1', '6')
     #: 16  Y/CrCb 4:2:2
-    PIX_FMT_NV61 = v4l2_fourcc('N', 'V', '6', '1')
+    NV61 = v4l2_fourcc('N', 'V', '6', '1')
     #: 24  Y/CbCr 4:4:4
-    PIX_FMT_NV24 = v4l2_fourcc('N', 'V', '2', '4')
+    NV24 = v4l2_fourcc('N', 'V', '2', '4')
     #: 24  Y/CrCb 4:4:4
-    PIX_FMT_NV42 = v4l2_fourcc('N', 'V', '4', '2')
+    NV42 = v4l2_fourcc('N', 'V', '4', '2')
 
     ###############################################################
     # two non contiguous planes - one Y, one Cr + Cb interleaved. #
     ###############################################################
     #: 12  Y/CbCr 4:2:0
-    PIX_FMT_NV12M = v4l2_fourcc('N', 'M', '1', '2')
+    NV12M = v4l2_fourcc('N', 'M', '1', '2')
     #: 21  Y/CrCb 4:2:0
-    PIX_FMT_NV21M = v4l2_fourcc('N', 'M', '2', '1')
+    NV21M = v4l2_fourcc('N', 'M', '2', '1')
     #: 16  Y/CbCr 4:2:2
-    PIX_FMT_NV16M = v4l2_fourcc('N', 'M', '1', '6')
+    NV16M = v4l2_fourcc('N', 'M', '1', '6')
     #: 16  Y/CrCb 4:2:2
-    PIX_FMT_NV61M = v4l2_fourcc('N', 'M', '6', '1')
+    NV61M = v4l2_fourcc('N', 'M', '6', '1')
     #: 12  Y/CbCr 4:2:0 64x32 m
-    PIX_FMT_NV12MT = v4l2_fourcc('T', 'M', '1', '2')
+    NV12MT = v4l2_fourcc('T', 'M', '1', '2')
     #: 12  Y/CbCr 4:2:0 16x16 m
-    PIX_FMT_NV12MT_16X16 = v4l2_fourcc('V', 'M', '1', '2')
+    NV12MT_16X16 = v4l2_fourcc('V', 'M', '1', '2')
 
     ############################
     # three planes - Y Cb, Cr. #
     ############################
     #: 9  YUV 4:1:0
-    PIX_FMT_YUV410 = v4l2_fourcc('Y', 'U', 'V', '9')
+    YUV410 = v4l2_fourcc('Y', 'U', 'V', '9')
     #: 9  YVU 4:1:0
-    PIX_FMT_YVU410 = v4l2_fourcc('Y', 'V', 'U', '9')
+    YVU410 = v4l2_fourcc('Y', 'V', 'U', '9')
     #: 12  YVU411 p
-    PIX_FMT_YUV411P = v4l2_fourcc('4', '1', '1', 'P')
+    YUV411P = v4l2_fourcc('4', '1', '1', 'P')
     #: 12  YUV 4:2:0
-    PIX_FMT_YUV420 = v4l2_fourcc('Y', 'U', '1', '2')
+    YUV420 = v4l2_fourcc('Y', 'U', '1', '2')
     #: 12  YVU 4:2:0
-    PIX_FMT_YVU420 = v4l2_fourcc('Y', 'V', '1', '2')
+    YVU420 = v4l2_fourcc('Y', 'V', '1', '2')
     #: 16  YVU422 p
-    PIX_FMT_YUV422P = v4l2_fourcc('4', '2', '2', 'P')
+    YUV422P = v4l2_fourcc('4', '2', '2', 'P')
 
     ############################################
     # three non contiguous planes - Y, Cb, Cr. #
     ############################################
     #: 12  YUV420 p
-    PIX_FMT_YUV420M = v4l2_fourcc('Y', 'M', '1', '2')
+    YUV420M = v4l2_fourcc('Y', 'M', '1', '2')
     #: 12  YVU420 p
-    PIX_FMT_YVU420M = v4l2_fourcc('Y', 'M', '2', '1')
+    YVU420M = v4l2_fourcc('Y', 'M', '2', '1')
     #: 16  YUV422 p
-    PIX_FMT_YUV422M = v4l2_fourcc('Y', 'M', '1', '6')
+    YUV422M = v4l2_fourcc('Y', 'M', '1', '6')
     #: 16  YVU422 p
-    PIX_FMT_YVU422M = v4l2_fourcc('Y', 'M', '6', '1')
+    YVU422M = v4l2_fourcc('Y', 'M', '6', '1')
     #: 24  YUV444 p
-    PIX_FMT_YUV444M = v4l2_fourcc('Y', 'M', '2', '4')
+    YUV444M = v4l2_fourcc('Y', 'M', '2', '4')
     #: 24  YVU444 p
-    PIX_FMT_YVU444M = v4l2_fourcc('Y', 'M', '4', '2')
+    YVU444M = v4l2_fourcc('Y', 'M', '4', '2')
 
     ######################################################################
     # Bayer formats - see http://www.siliconimaging.com/RGB%20Bayer.htm. #
     ######################################################################
     #: 8  BGBG.. GRGR.
-    PIX_FMT_SBGGR8 = v4l2_fourcc('B', 'A', '8', '1')
+    SBGGR8 = v4l2_fourcc('B', 'A', '8', '1')
     #: 8  GBGB.. RGRG.
-    PIX_FMT_SGBRG8 = v4l2_fourcc('G', 'B', 'R', 'G')
+    SGBRG8 = v4l2_fourcc('G', 'B', 'R', 'G')
     #: 8  GRGR.. BGBG.
-    PIX_FMT_SGRBG8 = v4l2_fourcc('G', 'R', 'B', 'G')
+    SGRBG8 = v4l2_fourcc('G', 'R', 'B', 'G')
     #: 8  RGRG.. GBGB.
-    PIX_FMT_SRGGB8 = v4l2_fourcc('R', 'G', 'G', 'B')
+    SRGGB8 = v4l2_fourcc('R', 'G', 'G', 'B')
     #: 10  BGBG.. GRGR.
-    PIX_FMT_SBGGR10 = v4l2_fourcc('B', 'G', '1', '0')
+    SBGGR10 = v4l2_fourcc('B', 'G', '1', '0')
     #: 10  GBGB.. RGRG.
-    PIX_FMT_SGBRG10 = v4l2_fourcc('G', 'B', '1', '0')
+    SGBRG10 = v4l2_fourcc('G', 'B', '1', '0')
     #: 10  GRGR.. BGBG.
-    PIX_FMT_SGRBG10 = v4l2_fourcc('B', 'A', '1', '0')
+    SGRBG10 = v4l2_fourcc('B', 'A', '1', '0')
     #: 10  RGRG.. GBGB.
-    PIX_FMT_SRGGB10 = v4l2_fourcc('R', 'G', '1', '0')
+    SRGGB10 = v4l2_fourcc('R', 'G', '1', '0')
     #######################################################
     # 10bit raw bayer packed, 5 bytes for every 4 pixels. #
     #######################################################
-    PIX_FMT_SBGGR10P = v4l2_fourcc('p', 'B', 'A', 'A')
-    PIX_FMT_SGBRG10P = v4l2_fourcc('p', 'G', 'A', 'A')
-    PIX_FMT_SGRBG10P = v4l2_fourcc('p', 'g', 'A', 'A')
-    PIX_FMT_SRGGB10P = v4l2_fourcc('p', 'R', 'A', 'A')
+    SBGGR10P = v4l2_fourcc('p', 'B', 'A', 'A')
+    SGBRG10P = v4l2_fourcc('p', 'G', 'A', 'A')
+    SGRBG10P = v4l2_fourcc('p', 'g', 'A', 'A')
+    SRGGB10P = v4l2_fourcc('p', 'R', 'A', 'A')
     ###############################################
     # 10bit raw bayer a-law compressed to 8 bits. #
     ###############################################
-    PIX_FMT_SBGGR10ALAW8 = v4l2_fourcc('a', 'B', 'A', '8')
-    PIX_FMT_SGBRG10ALAW8 = v4l2_fourcc('a', 'G', 'A', '8')
-    PIX_FMT_SGRBG10ALAW8 = v4l2_fourcc('a', 'g', 'A', '8')
-    PIX_FMT_SRGGB10ALAW8 = v4l2_fourcc('a', 'R', 'A', '8')
+    SBGGR10ALAW8 = v4l2_fourcc('a', 'B', 'A', '8')
+    SGBRG10ALAW8 = v4l2_fourcc('a', 'G', 'A', '8')
+    SGRBG10ALAW8 = v4l2_fourcc('a', 'g', 'A', '8')
+    SRGGB10ALAW8 = v4l2_fourcc('a', 'R', 'A', '8')
     ##############################################
     # 10bit raw bayer DPCM compressed to 8 bits. #
     ##############################################
-    PIX_FMT_SBGGR10DPCM8 = v4l2_fourcc('b', 'B', 'A', '8')
-    PIX_FMT_SGBRG10DPCM8 = v4l2_fourcc('b', 'G', 'A', '8')
-    PIX_FMT_SGRBG10DPCM8 = v4l2_fourcc('B', 'D', '1', '0')
-    PIX_FMT_SRGGB10DPCM8 = v4l2_fourcc('b', 'R', 'A', '8')
+    SBGGR10DPCM8 = v4l2_fourcc('b', 'B', 'A', '8')
+    SGBRG10DPCM8 = v4l2_fourcc('b', 'G', 'A', '8')
+    SGRBG10DPCM8 = v4l2_fourcc('B', 'D', '1', '0')
+    SRGGB10DPCM8 = v4l2_fourcc('b', 'R', 'A', '8')
     #: 12  BGBG.. GRGR.
-    PIX_FMT_SBGGR12 = v4l2_fourcc('B', 'G', '1', '2')
+    SBGGR12 = v4l2_fourcc('B', 'G', '1', '2')
     #: 12  GBGB.. RGRG.
-    PIX_FMT_SGBRG12 = v4l2_fourcc('G', 'B', '1', '2')
+    SGBRG12 = v4l2_fourcc('G', 'B', '1', '2')
     #: 12  GRGR.. BGBG.
-    PIX_FMT_SGRBG12 = v4l2_fourcc('B', 'A', '1', '2')
+    SGRBG12 = v4l2_fourcc('B', 'A', '1', '2')
     #: 12  RGRG.. GBGB.
-    PIX_FMT_SRGGB12 = v4l2_fourcc('R', 'G', '1', '2')
+    SRGGB12 = v4l2_fourcc('R', 'G', '1', '2')
     #######################################################
     # 12bit raw bayer packed, 6 bytes for every 4 pixels. #
     #######################################################
-    PIX_FMT_SBGGR12P = v4l2_fourcc('p', 'B', 'C', 'C')
-    PIX_FMT_SGBRG12P = v4l2_fourcc('p', 'G', 'C', 'C')
-    PIX_FMT_SGRBG12P = v4l2_fourcc('p', 'g', 'C', 'C')
-    PIX_FMT_SRGGB12P = v4l2_fourcc('p', 'R', 'C', 'C')
+    SBGGR12P = v4l2_fourcc('p', 'B', 'C', 'C')
+    SGBRG12P = v4l2_fourcc('p', 'G', 'C', 'C')
+    SGRBG12P = v4l2_fourcc('p', 'g', 'C', 'C')
+    SRGGB12P = v4l2_fourcc('p', 'R', 'C', 'C')
     #######################################################
     # 14bit raw bayer packed, 7 bytes for every 4 pixels. #
     #######################################################
-    PIX_FMT_SBGGR14P = v4l2_fourcc('p', 'B', 'E', 'E')
-    PIX_FMT_SGBRG14P = v4l2_fourcc('p', 'G', 'E', 'E')
-    PIX_FMT_SGRBG14P = v4l2_fourcc('p', 'g', 'E', 'E')
-    PIX_FMT_SRGGB14P = v4l2_fourcc('p', 'R', 'E', 'E')
+    SBGGR14P = v4l2_fourcc('p', 'B', 'E', 'E')
+    SGBRG14P = v4l2_fourcc('p', 'G', 'E', 'E')
+    SGRBG14P = v4l2_fourcc('p', 'g', 'E', 'E')
+    SRGGB14P = v4l2_fourcc('p', 'R', 'E', 'E')
     #: 16  BGBG.. GRGR.
-    PIX_FMT_SBGGR16 = v4l2_fourcc('B', 'Y', 'R', '2')
+    SBGGR16 = v4l2_fourcc('B', 'Y', 'R', '2')
     #: 16  GBGB.. RGRG.
-    PIX_FMT_SGBRG16 = v4l2_fourcc('G', 'B', '1', '6')
+    SGBRG16 = v4l2_fourcc('G', 'B', '1', '6')
     #: 16  GRGR.. BGBG.
-    PIX_FMT_SGRBG16 = v4l2_fourcc('G', 'R', '1', '6')
+    SGRBG16 = v4l2_fourcc('G', 'R', '1', '6')
     #: 16  RGRG.. GBGB.
-    PIX_FMT_SRGGB16 = v4l2_fourcc('R', 'G', '1', '6')
+    SRGGB16 = v4l2_fourcc('R', 'G', '1', '6')
 
     ################
     # HSV formats. #
     ################
-    PIX_FMT_HSV24 = v4l2_fourcc('H', 'S', 'V', '3')
-    PIX_FMT_HSV32 = v4l2_fourcc('H', 'S', 'V', '4')
+    HSV24 = v4l2_fourcc('H', 'S', 'V', '3')
+    HSV32 = v4l2_fourcc('H', 'S', 'V', '4')
 
     #######################
     # compressed formats. #
     #######################
     #: Motion-J
-    PIX_FMT_MJPEG = v4l2_fourcc('M', 'J', 'P', 'G')
+    MJPEG = v4l2_fourcc('M', 'J', 'P', 'G')
     #: JFIF J
-    PIX_FMT_JPEG = v4l2_fourcc('J', 'P', 'E', 'G')
+    JPEG = v4l2_fourcc('J', 'P', 'E', 'G')
     #: 1
-    PIX_FMT_DV = v4l2_fourcc('d', 'v', 's', 'd')
+    DV = v4l2_fourcc('d', 'v', 's', 'd')
     #: MPEG-1/2/4 M
-    PIX_FMT_MPEG = v4l2_fourcc('M', 'P', 'E', 'G')
+    MPEG = v4l2_fourcc('M', 'P', 'E', 'G')
     #: H264 with start c
-    PIX_FMT_H264 = v4l2_fourcc('H', '2', '6', '4')
+    H264 = v4l2_fourcc('H', '2', '6', '4')
     #: H264 without start c
-    PIX_FMT_H264_NO_SC = v4l2_fourcc('A', 'V', 'C', '1')
+    H264_NO_SC = v4l2_fourcc('A', 'V', 'C', '1')
     #: H264 M
-    PIX_FMT_H264_MVC = v4l2_fourcc('M', '2', '6', '4')
+    H264_MVC = v4l2_fourcc('M', '2', '6', '4')
     #: H
-    PIX_FMT_H263 = v4l2_fourcc('H', '2', '6', '3')
+    H263 = v4l2_fourcc('H', '2', '6', '3')
     #: MPEG-1 E
-    PIX_FMT_MPEG1 = v4l2_fourcc('M', 'P', 'G', '1')
+    MPEG1 = v4l2_fourcc('M', 'P', 'G', '1')
     #: MPEG-2 E
-    PIX_FMT_MPEG2 = v4l2_fourcc('M', 'P', 'G', '2')
+    MPEG2 = v4l2_fourcc('M', 'P', 'G', '2')
     #: MPEG-2 parsed slice d
-    PIX_FMT_MPEG2_SLICE = v4l2_fourcc('M', 'G', '2', 'S')
+    MPEG2_SLICE = v4l2_fourcc('M', 'G', '2', 'S')
     #: MPEG-4 part 2 E
-    PIX_FMT_MPEG4 = v4l2_fourcc('M', 'P', 'G', '4')
+    MPEG4 = v4l2_fourcc('M', 'P', 'G', '4')
     #: X
-    PIX_FMT_XVID = v4l2_fourcc('X', 'V', 'I', 'D')
+    XVID = v4l2_fourcc('X', 'V', 'I', 'D')
     #: SMPTE 421M Annex G compliant s
-    PIX_FMT_VC1_ANNEX_G = v4l2_fourcc('V', 'C', '1', 'G')
+    VC1_ANNEX_G = v4l2_fourcc('V', 'C', '1', 'G')
     #: SMPTE 421M Annex L compliant s
-    PIX_FMT_VC1_ANNEX_L = v4l2_fourcc('V', 'C', '1', 'L')
+    VC1_ANNEX_L = v4l2_fourcc('V', 'C', '1', 'L')
     #: V
-    PIX_FMT_VP8 = v4l2_fourcc('V', 'P', '8', '0')
+    VP8 = v4l2_fourcc('V', 'P', '8', '0')
     #: V
-    PIX_FMT_VP9 = v4l2_fourcc('V', 'P', '9', '0')
+    VP9 = v4l2_fourcc('V', 'P', '9', '0')
     #: HEVC aka H.2
-    PIX_FMT_HEVC = v4l2_fourcc('H', 'E', 'V', 'C')
+    HEVC = v4l2_fourcc('H', 'E', 'V', 'C')
     #: Fast Walsh Hadamard Transform (vicodec)
-    PIX_FMT_FWHT = v4l2_fourcc('F', 'W', 'H', 'T')
+    FWHT = v4l2_fourcc('F', 'W', 'H', 'T')
     #: Stateless FWHT (vicodec)
-    PIX_FMT_FWHT_STATELESS = v4l2_fourcc('S', 'F', 'W', 'H')
+    FWHT_STATELESS = v4l2_fourcc('S', 'F', 'W', 'H')
 
     #############################
     #  Vendor-specific formats. #
     #############################
     #: cpia1 Y
-    PIX_FMT_CPIA1 = v4l2_fourcc('C', 'P', 'I', 'A')
+    CPIA1 = v4l2_fourcc('C', 'P', 'I', 'A')
     #: Winnov hw c
-    PIX_FMT_WNVA = v4l2_fourcc('W', 'N', 'V', 'A')
+    WNVA = v4l2_fourcc('W', 'N', 'V', 'A')
     #: SN9C10x c
-    PIX_FMT_SN9C10X = v4l2_fourcc('S', '9', '1', '0')
+    SN9C10X = v4l2_fourcc('S', '9', '1', '0')
     #: SN9C20x YUV 4:2:0
-    PIX_FMT_SN9C20X_I420 = v4l2_fourcc('S', '9', '2', '0')
+    SN9C20X_I420 = v4l2_fourcc('S', '9', '2', '0')
     #: pwc older w
-    PIX_FMT_PWC1 = v4l2_fourcc('P', 'W', 'C', '1')
+    PWC1 = v4l2_fourcc('P', 'W', 'C', '1')
     #: pwc newer w
-    PIX_FMT_PWC2 = v4l2_fourcc('P', 'W', 'C', '2')
+    PWC2 = v4l2_fourcc('P', 'W', 'C', '2')
     #: ET61X251 c
-    PIX_FMT_ET61X251 = v4l2_fourcc('E', '6', '2', '5')
+    ET61X251 = v4l2_fourcc('E', '6', '2', '5')
     #: YUYV per l
-    PIX_FMT_SPCA501 = v4l2_fourcc('S', '5', '0', '1')
+    SPCA501 = v4l2_fourcc('S', '5', '0', '1')
     #: YYUV per l
-    PIX_FMT_SPCA505 = v4l2_fourcc('S', '5', '0', '5')
+    SPCA505 = v4l2_fourcc('S', '5', '0', '5')
     #: YUVY per l
-    PIX_FMT_SPCA508 = v4l2_fourcc('S', '5', '0', '8')
+    SPCA508 = v4l2_fourcc('S', '5', '0', '8')
     #: compressed GBRG b
-    PIX_FMT_SPCA561 = v4l2_fourcc('S', '5', '6', '1')
+    SPCA561 = v4l2_fourcc('S', '5', '6', '1')
     #: compressed BGGR b
-    PIX_FMT_PAC207 = v4l2_fourcc('P', '2', '0', '7')
+    PAC207 = v4l2_fourcc('P', '2', '0', '7')
     #: compressed BGGR b
-    PIX_FMT_MR97310A = v4l2_fourcc('M', '3', '1', '0')
+    MR97310A = v4l2_fourcc('M', '3', '1', '0')
     #: compressed RGGB b
-    PIX_FMT_JL2005BCD = v4l2_fourcc('J', 'L', '2', '0')
+    JL2005BCD = v4l2_fourcc('J', 'L', '2', '0')
     #: compressed GBRG b
-    PIX_FMT_SN9C2028 = v4l2_fourcc('S', 'O', 'N', 'X')
+    SN9C2028 = v4l2_fourcc('S', 'O', 'N', 'X')
     #: compressed RGGB b
-    PIX_FMT_SQ905C = v4l2_fourcc('9', '0', '5', 'C')
+    SQ905C = v4l2_fourcc('9', '0', '5', 'C')
     #: Pixart 73xx J
-    PIX_FMT_PJPG = v4l2_fourcc('P', 'J', 'P', 'G')
+    PJPG = v4l2_fourcc('P', 'J', 'P', 'G')
     #: ov511 J
-    PIX_FMT_OV511 = v4l2_fourcc('O', '5', '1', '1')
+    OV511 = v4l2_fourcc('O', '5', '1', '1')
     #: ov518 J
-    PIX_FMT_OV518 = v4l2_fourcc('O', '5', '1', '8')
+    OV518 = v4l2_fourcc('O', '5', '1', '8')
     #: stv0680 b
-    PIX_FMT_STV0680 = v4l2_fourcc('S', '6', '8', '0')
+    STV0680 = v4l2_fourcc('S', '6', '8', '0')
     #: tm5600/t
-    PIX_FMT_TM6000 = v4l2_fourcc('T', 'M', '6', '0')
+    TM6000 = v4l2_fourcc('T', 'M', '6', '0')
     #: one line of Y then 1 line of V
-    PIX_FMT_CIT_YYVYUY = v4l2_fourcc('C', 'I', 'T', 'V')
+    CIT_YYVYUY = v4l2_fourcc('C', 'I', 'T', 'V')
     #: YUV420 planar in blocks of 256 p
-    PIX_FMT_KONICA420 = v4l2_fourcc('K', 'O', 'N', 'I')
+    KONICA420 = v4l2_fourcc('K', 'O', 'N', 'I')
     #: JPEG-L
-    PIX_FMT_JPGL = v4l2_fourcc('J', 'P', 'G', 'L')
+    JPGL = v4l2_fourcc('J', 'P', 'G', 'L')
     #: se401 janggu compressed r
-    PIX_FMT_SE401 = v4l2_fourcc('S', '4', '0', '1')
+    SE401 = v4l2_fourcc('S', '4', '0', '1')
     #: S5C73M3 interleaved UYVY/J
-    PIX_FMT_S5C_UYVY_JPG = v4l2_fourcc('S', '5', 'C', 'I')
+    S5C_UYVY_JPG = v4l2_fourcc('S', '5', 'C', 'I')
     #: Greyscale 8-bit L/R i
-    PIX_FMT_Y8I = v4l2_fourcc('Y', '8', 'I', ' ')
+    Y8I = v4l2_fourcc('Y', '8', 'I', ' ')
     #: Greyscale 12-bit L/R i
-    PIX_FMT_Y12I = v4l2_fourcc('Y', '1', '2', 'I')
+    Y12I = v4l2_fourcc('Y', '1', '2', 'I')
     #: Depth data 16-b
-    PIX_FMT_Z16 = v4l2_fourcc('Z', '1', '6', ' ')
+    Z16 = v4l2_fourcc('Z', '1', '6', ' ')
     #: Mediatek compressed block m
-    PIX_FMT_MT21C = v4l2_fourcc('M', 'T', '2', '1')
+    MT21C = v4l2_fourcc('M', 'T', '2', '1')
     #: Intel Planar Greyscale 10-bit and Depth 16-b
-    PIX_FMT_INZI = v4l2_fourcc('I', 'N', 'Z', 'I')
+    INZI = v4l2_fourcc('I', 'N', 'Z', 'I')
     #: Sunxi Tiled NV12 F
-    PIX_FMT_SUNXI_TILED_NV12 = v4l2_fourcc('S', 'T', '1', '2')
+    SUNXI_TILED_NV12 = v4l2_fourcc('S', 'T', '1', '2')
     #: Intel 4-bit packed depth confidence i
-    PIX_FMT_CNF4 = v4l2_fourcc('C', 'N', 'F', '4')
+    CNF4 = v4l2_fourcc('C', 'N', 'F', '4')
 
     #########################################################################
     # 10bit raw bayer packed, 32 bytes for every 25 pixels, last LSB 6 bits #
     # unused.                                                               #
     #########################################################################
     #: IPU3 packed 10-bit BGGR b
-    PIX_FMT_IPU3_SBGGR10 = v4l2_fourcc('i', 'p', '3', 'b')
+    IPU3_SBGGR10 = v4l2_fourcc('i', 'p', '3', 'b')
     #: IPU3 packed 10-bit GBRG b
-    PIX_FMT_IPU3_SGBRG10 = v4l2_fourcc('i', 'p', '3', 'g')
+    IPU3_SGBRG10 = v4l2_fourcc('i', 'p', '3', 'g')
     #: IPU3 packed 10-bit GRBG b
-    PIX_FMT_IPU3_SGRBG10 = v4l2_fourcc('i', 'p', '3', 'G')
+    IPU3_SGRBG10 = v4l2_fourcc('i', 'p', '3', 'G')
     #: IPU3 packed 10-bit RGGB b
-    PIX_FMT_IPU3_SRGGB10 = v4l2_fourcc('i', 'p', '3', 'r')
+    IPU3_SRGGB10 = v4l2_fourcc('i', 'p', '3', 'r')
 
-    ###############################################################
-    # SDR formats - used only for Software Defined Radio devices. #
-    ###############################################################
+
+class V4l2SdrFormats(IntEnum):
+    """SDR formats - used only for Software Defined Radio devices."""
     #: IQ u
-    SDR_FMT_CU8 = v4l2_fourcc('C', 'U', '0', '8')
+    CU8 = v4l2_fourcc('C', 'U', '0', '8')
     #: IQ u
-    SDR_FMT_CU16LE = v4l2_fourcc('C', 'U', '1', '6')
+    CU16LE = v4l2_fourcc('C', 'U', '1', '6')
     #: complex s
-    SDR_FMT_CS8 = v4l2_fourcc('C', 'S', '0', '8')
+    CS8 = v4l2_fourcc('C', 'S', '0', '8')
     #: complex s
-    SDR_FMT_CS14LE = v4l2_fourcc('C', 'S', '1', '4')
+    CS14LE = v4l2_fourcc('C', 'S', '1', '4')
     #: real u
-    SDR_FMT_RU12LE = v4l2_fourcc('R', 'U', '1', '2')
+    RU12LE = v4l2_fourcc('R', 'U', '1', '2')
     #: planar complex u
-    SDR_FMT_PCU16BE = v4l2_fourcc('P', 'C', '1', '6')
+    PCU16BE = v4l2_fourcc('P', 'C', '1', '6')
     #: planar complex u
-    SDR_FMT_PCU18BE = v4l2_fourcc('P', 'C', '1', '8')
+    PCU18BE = v4l2_fourcc('P', 'C', '1', '8')
     #: planar complex u
-    SDR_FMT_PCU20BE = v4l2_fourcc('P', 'C', '2', '0')
+    PCU20BE = v4l2_fourcc('P', 'C', '2', '0')
 
-    ###########################################
-    # Touch formats - used for Touch devices. #
-    ###########################################
+
+class V4l2TouchFormats(IntEnum):
+    """Touch formats - used for Touch devices."""
     #: 16-bit signed d
-    TCH_FMT_DELTA_TD16 = v4l2_fourcc('T', 'D', '1', '6')
+    DELTA_TD16 = v4l2_fourcc('T', 'D', '1', '6')
     #: 8-bit signed d
-    TCH_FMT_DELTA_TD08 = v4l2_fourcc('T', 'D', '0', '8')
+    DELTA_TD08 = v4l2_fourcc('T', 'D', '0', '8')
     #: 16-bit unsigned touch d
-    TCH_FMT_TU16 = v4l2_fourcc('T', 'U', '1', '6')
+    TU16 = v4l2_fourcc('T', 'U', '1', '6')
     #: 8-bit unsigned touch d
-    TCH_FMT_TU08 = v4l2_fourcc('T', 'U', '0', '8')
+    TU08 = v4l2_fourcc('T', 'U', '0', '8')
 
-    #####################
-    # Meta-data formats #
-    #####################
+
+class V4l2MetaFormats(IntEnum):
+    """Meta-data formats."""
     #: R-Car VSP1 1-D H
-    META_FMT_VSP1_HGO = v4l2_fourcc('V', 'S', 'P', 'H')
+    VSP1_HGO = v4l2_fourcc('V', 'S', 'P', 'H')
     #: R-Car VSP1 2-D H
-    META_FMT_VSP1_HGT = v4l2_fourcc('V', 'S', 'P', 'T')
+    VSP1_HGT = v4l2_fourcc('V', 'S', 'P', 'T')
     #: UVC Payload Header m
-    META_FMT_UVC = v4l2_fourcc('U', 'V', 'C', 'H')
+    UVC = v4l2_fourcc('U', 'V', 'C', 'H')
     #: D4XX Payload Header m
-    META_FMT_D4XX = v4l2_fourcc('D', '4', 'X', 'X')
+    D4XX = v4l2_fourcc('D', '4', 'X', 'X')
     #: Vivid M
-    META_FMT_VIVID = v4l2_fourcc('V', 'I', 'V', 'D')
+    VIVID = v4l2_fourcc('V', 'I', 'V', 'D')
+
+
+# The format enums contained in V4l2Formats.
+_v4l2_formats = [V4l2PixFormats,
+                 V4l2SdrFormats,
+                 V4l2TouchFormats,
+                 V4l2MetaFormats,
+                 ]
+
+
+class V4l2Formats(BaseEnumContainer, enums=_v4l2_formats):
+    __doc__ = """An Enum-Container for all V4l2Formats.
+    This class delegates its operations to the contained enums.
+    For more information, see:
+    \t""" + "\t\n\t".join(map(lambda x: "py:class:`"+x.__name__+"`",
+                              _v4l2_formats))
 
 
 class V4l2PixFormatFlags(IntFlag):
@@ -545,6 +562,136 @@ class V4l2FrameIvalTypes(IntEnum):
     CONTINUOUS = 2
     #: Step-wise defined frame interval.
     STEPWISE = 3
+
+
+###############################################################################
+# An abstraction of the capabilities' directives defined in linux/videodev2.h.
+# These are the capabilities used in V4l2IoctlCapability.capabilities and
+# V4l2IoctlCapability.device_caps.
+###############################################################################
+class V4l2Capabilities(IntFlag):
+    """The v4l2 capability flags.
+
+    These are the flags defining the supported capabilities of a V4l2 devince.
+
+    Example:
+        Check if device /dev/video0 supports video capturing::
+
+            vid_dev = VideoDevice(r"/dev/video0")
+            if CapabilityFlags.VIDEO_CAPTURE in vid_dev.capabilities:
+                start_recording()
+    """
+    #: Is a video capture device.
+    VIDEO_CAPTURE = 0x00000001
+    #: Is a video output device.
+    VIDEO_OUTPUT = 0x00000002
+    #: Can do video overlay.
+    VIDEO_OVERLAY = 0x00000004
+
+    #: Is a raw VBI capture device.
+    VBI_CAPTURE = 0x00000010
+    #: Is a raw VBI output device.
+    VBI_OUTPUT = 0x00000020
+    #: Is a sliced VBI capture device.
+    SLICED_VBI_CAPTURE = 0x00000040
+    #: Is a sliced VBI output device.
+    SLICED_VBI_OUTPUT = 0x00000080
+
+    #: RDS data capture.
+    RDS_CAPTURE = 0x00000100
+    #: Can do video output overlay.
+    VIDEO_OUTPUT_OVERLAY = 0x00000200
+    #: Can do hardware frequency seek.
+    HW_FREQ_SEEK = 0x00000400
+    #: Is an RDS encoder.
+    RDS_OUTPUT = 0x00000800
+
+    #: Is a video capture device that supports multiplanar formats.
+    VIDEO_CAPTURE_MPLANE = 0x00001000
+    #: Is a video output device that supports multiplanar formats.
+    VIDEO_OUTPUT_MPLANE = 0x00002000
+    #: Is a video mem-to-mem device that supports multiplanar formats.
+    VIDEO_M2M_MPLANE = 0x00004000
+    #: Is a video mem-to-mem device.
+    VIDEO_M2M = 0x00008000
+
+    #: Has a tuner.
+    TUNER = 0x00010000
+    #: Has audio support.
+    AUDIO = 0x00020000
+    #: Is a radio device.
+    RADIO = 0x00040000
+    #: Has a modulator.
+    MODULATOR = 0x00080000
+
+    #: Is a SDR capture device.
+    SDR_CAPTURE = 0x00100000
+    #: Supports the extended pixel format.
+    EXT_PIX_FORMAT = 0x00200000
+    #: Is a SDR output device.
+    SDR_OUTPUT = 0x00400000
+    #: Is a metadata capture device.
+    META_CAPTURE = 0x00800000
+
+    #: Read/write systemcalls.
+    READWRITE = 0x01000000
+    #: Async I/O.
+    ASYNCIO = 0x02000000
+    #: Streaming I/O ioctls.
+    STREAMING = 0x04000000
+    #: Is a metadata output device.
+    META_OUTPUT = 0x08000000
+
+    #: Is a touch device.
+    TOUCH = 0x10000000
+    #: Sets device capabilities field.
+    DEVICE_CAPS = 0x80000000
+
+
+###############################################################################
+# An abstraction of enum v4l2_buf_type in linux/videodev2.h.
+# These are the buffer types used in V4l2IoctlFmtDesc.type.
+###############################################################################
+class V4l2BufferType(IntEnum):
+    """The v4l2 buffer types.
+
+    Used with :attribute:`enum_fmt`.
+    """
+    #: Buffer of a single-planar video capture stream, see Video Capture
+    #: Interface.
+    VIDEO_CAPTURE = 1
+    #: Buffer of a single-planar video output stream, see Video Output
+    #: Interface.
+    VIDEO_OUTPUT = 2
+    #: Buffer for video overlay, see Video Overlay Interface.
+    VIDEO_OVERLAY = 3
+    #: Buffer of a raw VBI capture stream, see Raw VBI Data Interface.
+    VBI_CAPTURE = 4
+    #: Buffer of a raw VBI output stream, see Raw VBI Data Interface.
+    VBI_OUTPUT = 5
+    #: Buffer of a sliced VBI capture stream, see Sliced VBI Data Interface.
+    SLICED_VBI_CAPTURE = 6
+    #: Buffer of a sliced VBI output stream, see Sliced VBI Data Interface.
+    SLICED_VBI_OUTPUT = 7
+    #: Buffer for video output overlay (OSD), see Video Output Overlay
+    #: Interface.
+    VIDEO_OUTPUT_OVERLAY = 8
+    #: Buffer of a multi-planar video capture stream, see Video Capture
+    #: Interface.
+    VIDEO_CAPTURE_MPLANE = 9
+    #: Buffer of a multi-planar video output stream, see Video Output
+    #: Interface.
+    VIDEO_OUTPUT_MPLANE = 10
+    #: Buffer for Software Defined Radio (SDR) capture stream, see Software
+    #: Defined Radio Interface (SDR).
+    SDR_CAPTURE = 11
+    #: Buffer for Software Defined Radio (SDR) output stream, see Software
+    #: Defined Radio Interface (SDR).
+    SDR_OUTPUT = 12
+    #: Buffer for metadata capture, see Metadata Interface.
+    META_CAPTURE = 13
+    #: Buffer for metadata output, see Metadata Interface.
+    META_OUTPUT = 14
 
 
 class V4l2Field(IntEnum):
@@ -700,3 +847,98 @@ class V4l2ColorSpace(IntEnum):
     RAW = 11
     #: DCI-P3 colorspace, used by cinema projectors.
     DCI_P3 = 12
+
+
+class V4l2XferFunc(IntEnum):
+    """V4L2 Transfer Function."""
+    #: Mapping of :py:attr:`V4l2XferFunc.DEFAULT` to actual transfer functions
+    #: for the various colorspaces:
+    #:
+    #: :py:attr:`V4l2ColorSpace.SMPTE170M`,
+    #: :py:attr:`V4l2ColorSpace.470_SYSTEM_M`,
+    #: :py:attr:`V4l2ColorSpace.470_SYSTEM_BG`,
+    #: :py:attr:`V4l2ColorSpace.REC709` and :py:attr:`V4l2ColorSpace.BT2020`:
+    #: :py:attr:`V4l2XferFunc.709`
+    #:
+    #: :py:attr:`V4l2ColorSpace.SRGB`, :py:attr:`V4l2ColorSpace.JPEG`:
+    #: :py:attr:`V4l2XferFunc.SRGB`
+    #:
+    #: :py:attr:`V4l2ColorSpace.OPRGB`: :py:attr:`V4l2XferFunc.OPRGB`
+    #:
+    #: :py:attr:`V4l2ColorSpace.SMPTE240M`: :py:attr:`V4l2XferFunc.SMPTE240M`
+    #:
+    #: :py:attr:`V4l2ColorSpace.RAW`: :py:attr:`V4l2XferFunc.NONE`
+    #:
+    #: :py:attr:`V4l2ColorSpace.DCI_P3`: :py:attr:`V4l2XferFunc.DCI_P3`
+    DEFAULT = 0
+    _709 = 1
+    SRGB = 2
+    OPRGB = 3
+    SMPTE240M = 4
+    NONE = 5
+    DCI_P3 = 6
+    SMPTE2084 = 7
+
+
+class V4l2YcbcrEncoding(IntEnum):
+    """V4L2 Y’CbCr Encodings."""
+    #: Mapping of :py:attr:`V4l2YcbcrEncoding.DEFAULT` to actual encodings for
+    #: the various colorspaces:
+    #:
+    #: :py:attr:`V4l2ColorSpace.SMPTE170M`,
+    #: :py:attr:`V4l2ColorSpace.470_SYSTEM_M`,
+    #: :py:attr:`V4l2ColorSpace.470_SYSTEM_BG`, :py:attr:`V4l2ColorSpace.SRGB`,
+    #: :py:attr:`V4l2ColorSpace.OPRGB` and :py:attr:`V4l2ColorSpace.JPEG`:
+    #: :py:attr:`V4l2YcbcrEncoding.601`
+    #:
+    #: :py:attr:`V4l2ColorSpace.REC709` and :py:attr:`V4l2ColorSpace.DCI_P3`:
+    #: :py:attr:`V4l2YcbcrEncoding.709`
+    #:
+    #: :py:attr:`V4l2ColorSpace.BT2020`: :py:attr:`V4l2YcbcrEncoding.BT2020`
+    #:
+    #: :py:attr:`V4l2ColorSpace.SMPTE240M`:
+    #: :py:attr:`V4l2YcbcrEncoding.SMPTE240M`
+    DEFAULT = 0
+    #: ITU-R 601 -- SDTV.
+    _601 = 1
+    #: Rec. 709 -- HDTV.
+    _709 = 2
+    #: ITU-R 601/EN 61966-2-4 Extended Gamut -- SDTV.
+    XV601 = 3
+    #: Rec. 709/EN 61966-2-4 Extended Gamut -- HDTV.
+    XV709 = 4
+    #: sYCC (Y'CbCr encoding of sRGB), identical to ENC_601. It was added
+    #: originally due to a misunderstanding of the sYCC standard. It should
+    #: not be used, instead use :py:attr:`V4l2YcbcrEncoding.601`.
+    SYCC = 5
+    #: BT.2020 Non-constant Luminance Y'CbCr.
+    BT2020 = 6
+    #: BT.2020 Constant Luminance Y'CbcCrc.
+    BT2020_CONST_LUM = 7
+    #: SMPTE 240M -- Obsolete HDTV.
+    SMPTE240M = 8
+
+
+class V4l2HsvEncoding(IntEnum):
+    """V4L2 HSV Encodings."""
+    #: For the Hue, each LSB is two degrees.
+    ENC_180 = 128
+    #: For the Hue, the 360 degrees are mapped into 8 bits, i.e. each LSB is
+    #: roughly 1.41 degrees.
+    ENC_256 = 129
+
+
+class V4l2Quantization(IntEnum):
+    """V4L2 Quantization Methods."""
+    #: Use the default quantization encoding as defined by the colorspace. This
+    #: is always full range for R’G’B’ (except for the BT.2020 colorspace) and
+    #: HSV. It is usually limited range for Y’CbCr.
+    DEFAULT = 0
+    #: Use the full range quantization encoding. I.e. the range [0…1] is mapped
+    #: to [0…255] (with possible clipping to [1…254] to avoid the 0x00 and 0xff
+    #: values). Cb and Cr are mapped from [-0.5…0.5] to [0…255] (with possible
+    #: clipping to [1…254] to avoid the 0x00 and 0xff values).
+    FULL_RANGE = 1
+    #: Use the limited range quantization encoding. I.e. the range [0…1] is
+    #: mapped to [16…235]. Cb and Cr are mapped from [-0.5…0.5] to [16…240].
+    LIM_RANGE = 2

@@ -19,6 +19,7 @@ __all__ = ["V4l2IocOps", "V4l2Capabilities", "V4l2BufferType", "V4l2Formats",
            "IoctlError"
            ]
 
-from .v4l2ioctl import V4l2IocOps, V4l2Capabilities, V4l2BufferType, IoctlError
+from .v4l2ioctl import V4l2IocOps, IoctlError
 from .v4l2ioctlenums import V4l2Formats, V4l2FormatDescFlags, \
-                            V4l2FrameSizeTypes, V4l2FrameIvalTypes
+                            V4l2FrameSizeTypes, V4l2FrameIvalTypes, \
+                            V4l2Capabilities, V4l2BufferType
