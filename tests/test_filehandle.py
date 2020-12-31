@@ -25,7 +25,7 @@ site.addsitedir(r"..")  # For executing this file as is.
 from v4l2ctl.utils.filehandle import FileHandleCM, FileHandleStatus  # noqa E402
 
 
-TEST_FILE = "/dev/null"
+TEST_FILE = "/dev/zero"
 
 
 def count_open_files(filename=TEST_FILE):
