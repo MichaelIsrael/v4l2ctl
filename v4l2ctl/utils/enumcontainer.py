@@ -44,7 +44,7 @@ class MetaEnumContainer(type):
 
 
 class BaseEnumContainer(metaclass=MetaEnumContainer):
-    def __init_subclass__(cls, /, enums, **kwargs):
+    def __init_subclass__(cls, enums, **kwargs):
         if type(enums) is EnumMeta:
             cls._enums = [enums]
         else:
