@@ -36,7 +36,9 @@ class V4l2CtlInterface(object):
     @staticmethod
     def _v4l2_ctrl(*args):
         proc = subprocess.run(["v4l2-ctl", *args],
-                              capture_output=True,
+                              # capture_output=True,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
                               encoding="utf-8",
                               )
         return proc.returncode, proc.stdout.splitlines()
