@@ -102,7 +102,7 @@ class IoctlAbstraction(object):
             setattr(buff, key, value)
 
         # Run the ioctl request.
-        with open(self._device, "rb") as dev_fd:
+        with self._device as dev_fd:
             Timeout = 20
             while Timeout > 0:
                 try:
@@ -111,7 +111,7 @@ class IoctlAbstraction(object):
                     if "Errno 4" in str(e):
                         pass
                     else:
-                        raise IoctlError(self._device,
+                        raise IoctlError(self._device.filename,
                                          self._name,
                                          self._code,
                                          -1,
@@ -121,7 +121,7 @@ class IoctlAbstraction(object):
                     break
                 Timeout -= 1
             else:
-                raise IoctlError(self._device,
+                raise IoctlError(self._device.filename,
                                  self._name,
                                  self._code,
                                  -1,
@@ -133,7 +133,10 @@ class IoctlAbstraction(object):
         # ioctl call. But the python documentation says the return code will be
         # passed back to python, so anyway, better safe than sorry :)
         if ret_code != 0:
-            raise IoctlError(self._device, self._name, self._code, ret_code)
+            raise IoctlError(self._device.filename,
+                             self._name,
+                             self._code,
+                             ret_code)
 
         return buff
 
@@ -151,9 +154,8 @@ class V4l2IocOps(object):
 
     :meta private:
     """
-    def __init__(self, device):
-        # This page is intentionally empty. ;)
-        pass
+    def __init__(self, device, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __new__(cls, device):
         # Create base object.
@@ -179,8 +181,13 @@ class V4l2IocOps(object):
                                         V4l2IoctlFmtDesc)
 
         # define VIDIOC_G_FMT		_IOWR('V',  4, struct v4l2_format)
+        obj.get_format = None
+
         # define VIDIOC_S_FMT		_IOWR('V',  5, struct v4l2_format)
+        obj.set_format = None
+
         # define VIDIOC_TRY_FMT		_IOWR('V', 64, struct v4l2_format)
+        obj.try_format = None
 
         # define VIDIOC_CROPCAP		_IOWR('V', 58, struct v4l2_cropcap)
         obj.crop_cap = IoctlAbstraction(device,

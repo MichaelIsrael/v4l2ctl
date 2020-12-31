@@ -18,13 +18,15 @@ from .ioctls import V4l2IocOps, V4l2Capabilities, V4l2BufferType, IoctlError
 from .v4l2types import V4l2Rectangle, V4l2CroppingCapabilities
 from .v4l2format import V4l2Format
 from pathlib import Path
+from .utils.filehandle import FileHandleCM, FileHandleStatus
+import io
 
 
 class FeatureNotSupported(Exception):
     pass
 
 
-class V4l2Device(object):
+class V4l2Device(io.IOBase):
     """Initialize the V4l2Device object and read its basic information.
 
     Keyword arguments:
@@ -43,14 +45,17 @@ class V4l2Device(object):
                              V4l2BufferType.VIDEO_OVERLAY,
                              ]
 
+    ###########################################################################
+    # Constructor.
+    ###########################################################################
     def __init__(self, device=r"/dev/video0"):
         if isinstance(device, int):
             device = Path(r"/dev/video{}".format(device))
 
-        self._device = device
+        self._dev_handle = FileHandleCM(device, {"mode": "rb"})
 
         # Create V4l2IocOps object for the ioctl operations.
-        self._ioc_ops = V4l2IocOps(self._device)
+        self._ioc_ops = V4l2IocOps(self._dev_handle)
 
         # Query capabilities and basic information
         caps = self._ioc_ops.query_cap()
@@ -80,6 +85,70 @@ class V4l2Device(object):
         # Use the first supported buffer type as default.
         self._buffer_type = self._supported_buffer_types[0]
 
+    ###########################################################################
+    # I/O Interface
+    ###########################################################################
+    def __enter__(self):
+        self._open()
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+
+    def _open(self):
+        self._dev_handle.open()
+
+    def close(self):
+        self._dev_handle.close()
+
+    @property
+    def closed(self):
+        return self._dev_handle.status == FileHandleStatus.Closed
+
+    def fileno(self):
+        if self.closed:
+            raise ValueError("I/O operation on closed file")
+        return self._dev_handle.fileno()
+
+    def seekable(self):
+        return False
+
+    def flush(self):
+        pass
+
+    def isatty(self):
+        return False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = self.readline()
+        if not line:
+            raise StopIteration()
+        return line
+
+    def readable(self):
+        # TODO
+        return False
+
+    def readline(self, size=-1):
+        # TODO
+        raise io.UnsupportedOperation("readline")
+
+    def readlines(self, hint=-1):
+        # TODO
+        raise io.UnsupportedOperation("readlines")
+
+    def writable(self):
+        return False
+
+    def writelines(self, lines):
+        raise io.UnsupportedOperation("writelines")
+
+    ###########################################################################
+    # Device properties.
+    ###########################################################################
     @property
     def name(self):
         """The card name (read-only)."""
@@ -88,7 +157,7 @@ class V4l2Device(object):
     @property
     def device(self):
         """The device file (read-only)."""
-        return self._device
+        return self._dev_handle.filename
 
     @property
     def driver(self):
@@ -149,6 +218,9 @@ class V4l2Device(object):
         crop_caps = self._ioc_ops.crop_cap(type=self.buffer_type)
         return V4l2CroppingCapabilities._from_v4l2(crop_caps)
 
+    ###########################################################################
+    # V4L2 setters, getters and iterators/generators.
+    ###########################################################################
     @staticmethod
     def iter_devices(skip_links=True):
         """Return an iterator over the available v4l2 devices.
