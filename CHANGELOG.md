@@ -1,5 +1,11 @@
 # v4l2ctl change log
 
+## 0.1a4
+* Support cropping rectangles (querying, getting and setting).
+* Support setting and getting formats.
+* Add tool to auto generate Python implementations of C structures.
+* V4l2Device now implements the io.IOBase interface (no I/O features are supported yet).
+
 ## 0.1a3
 * Reading supported frame sizes.
 * Reading supported frame intervals.
