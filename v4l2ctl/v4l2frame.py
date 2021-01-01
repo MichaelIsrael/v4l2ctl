@@ -15,7 +15,9 @@
 # limitations under the Licence.
 ###############################################################################
 from .v4l2types import V4l2Fraction
-from .ioctls import V4l2Formats, V4l2FrameSizeTypes, V4l2FrameIvalTypes
+from .ioctls import (V4l2Formats, V4l2FrameSizeTypes, V4l2FrameIvalTypes,
+                     IoctlError,
+                     )
 from abc import ABC, abstractmethod
 
 
@@ -41,11 +43,11 @@ class V4l2FrameInterval(object):
             fractions of the form (min, max, step).
         """
         if self.type == V4l2FrameIvalTypes.DISCRETE:
-            return V4l2Fraction(self._frame_ival.discrete)
+            return V4l2Fraction._from_v4l2(self._frame_ival.discrete)
         else:
-            return (V4l2Fraction(self._frame_ival.stepwise.min),
-                    V4l2Fraction(self._frame_ival.stepwise.max),
-                    V4l2Fraction(self._frame_ival.stepwise.step),
+            return (V4l2Fraction._from_v4l2(self._frame_ival.stepwise.min),
+                    V4l2Fraction._from_v4l2(self._frame_ival.stepwise.max),
+                    V4l2Fraction._from_v4l2(self._frame_ival.stepwise.step),
                     )
 
     def __repr__(self):
@@ -146,7 +148,7 @@ class V4l2DiscreteFrameSize(V4l2FrameSize):
                     width=self.width,
                     height=self.height,
                     )
-            except OSError:
+            except IoctlError:
                 break
             else:
                 yield V4l2FrameInterval(frm_ival)
