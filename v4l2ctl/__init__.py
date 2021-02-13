@@ -15,13 +15,14 @@
 # limitations under the Licence.
 ###############################################################################
 __all__ = ["V4l2Device", "V4l2Capabilities", "V4l2BufferType", "V4l2Formats",
-           "V4l2FormatDescFlags",
-           "IoctlError", "FeatureNotSupported"
+           "V4l2FormatDescFlags", "V4l2Field",
+           "IoctlError", "FeatureNotSupported",
            ]
 __author__ = "Michael Israel"
-__version__ = "0.1a4"
+__version__ = "0.1b1"
 
 
 from .v4l2device import V4l2Device, FeatureNotSupported
-from .ioctls import V4l2Capabilities, V4l2BufferType, IoctlError, \
-                    V4l2Formats, V4l2FormatDescFlags
+from .ioctls import (V4l2Capabilities, V4l2BufferType, IoctlError,
+                     V4l2Formats, V4l2FormatDescFlags, V4l2Field,
+                     )
