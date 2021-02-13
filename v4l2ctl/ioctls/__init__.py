@@ -16,10 +16,14 @@
 ###############################################################################
 __all__ = ["V4l2IocOps", "V4l2Capabilities", "V4l2BufferType", "V4l2Formats",
            "V4l2FormatDescFlags", "V4l2FrameSizeTypes", "V4l2FrameIvalTypes",
-           "IoctlError"
+           "IoctlError", "V4l2PixFormats", "V4l2SdrFormats",
+           "V4l2TouchFormats", "V4l2MetaFormats", "V4l2Field",
            ]
 
 from .v4l2ioctl import V4l2IocOps, IoctlError
-from .v4l2ioctlenums import V4l2Formats, V4l2FormatDescFlags, \
-                            V4l2FrameSizeTypes, V4l2FrameIvalTypes, \
-                            V4l2Capabilities, V4l2BufferType
+from .v4l2ioctlenums import (V4l2Formats, V4l2FormatDescFlags,
+                             V4l2FrameSizeTypes, V4l2FrameIvalTypes,
+                             V4l2Capabilities, V4l2BufferType,
+                             V4l2PixFormats, V4l2SdrFormats, V4l2TouchFormats,
+                             V4l2MetaFormats, V4l2Field,
+                             )

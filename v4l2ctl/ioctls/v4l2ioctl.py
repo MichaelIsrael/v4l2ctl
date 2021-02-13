@@ -15,12 +15,15 @@
 # limitations under the Licence.
 ###############################################################################
 from .ioctlmacros import _IOC, _IOC_READ, _IOC_WRITE, _IOC_TYPECHECK
-from .v4l2ioctlstructs import V4l2IoctlFmtDesc, \
-                              V4l2IoctlFrameSizeEnum, \
-                              V4l2IoctlFrameIvalEnum, \
-                              V4l2IoctlCropCap, \
-                              V4l2IoctlCrop, \
-                              V4l2IoctlCapability
+from .v4l2ioctlstructs import (V4l2IoctlFmtDesc,
+                               V4l2IoctlFrameSizeEnum,
+                               V4l2IoctlFrameIvalEnum,
+                               V4l2IoctlCropCap,
+                               V4l2IoctlCrop,
+                               V4l2IoctlCapability,
+                               V4l2IoctlFormat,
+                               V4l2IoctlRequestbuffers,
+                               )
 from enum import IntEnum
 from fcntl import ioctl
 
@@ -181,13 +184,28 @@ class V4l2IocOps(object):
                                         V4l2IoctlFmtDesc)
 
         # define VIDIOC_G_FMT		_IOWR('V',  4, struct v4l2_format)
-        obj.get_format = None
+        obj.get_format = IoctlAbstraction(device,
+                                          "GetFormat",
+                                          IoctlDirection.RW,
+                                          'V',
+                                          4,
+                                          V4l2IoctlFormat)
 
         # define VIDIOC_S_FMT		_IOWR('V',  5, struct v4l2_format)
-        obj.set_format = None
+        obj.set_format = IoctlAbstraction(device,
+                                          "SetFormat",
+                                          IoctlDirection.RW,
+                                          'V',
+                                          5,
+                                          V4l2IoctlFormat)
 
-        # define VIDIOC_TRY_FMT		_IOWR('V', 64, struct v4l2_format)
-        obj.try_format = None
+        # define VIDIOC_REQBUFS		_IOWR('V',  8, struct v4l2_requestbuffers)
+        obj.request_buffers = IoctlAbstraction(device,
+                                               "RequestBuffers",
+                                               IoctlDirection.RW,
+                                               'V',
+                                               8,
+                                               V4l2IoctlRequestbuffers)
 
         # define VIDIOC_CROPCAP		_IOWR('V', 58, struct v4l2_cropcap)
         obj.crop_cap = IoctlAbstraction(device,
@@ -212,6 +230,14 @@ class V4l2IocOps(object):
                                         'V',
                                         60,
                                         V4l2IoctlCrop)
+
+        # define VIDIOC_TRY_FMT		_IOWR('V', 64, struct v4l2_format)
+        obj.try_format = IoctlAbstraction(device,
+                                          "TryFormat",
+                                          IoctlDirection.RW,
+                                          'V',
+                                          64,
+                                          V4l2IoctlFormat)
 
         # define VIDIOC_ENUM_FRAMESIZES _IOWR('V', 74, struct v4l2_frmsizeenum)
         obj.enum_frame_sizes = IoctlAbstraction(device,
@@ -255,7 +281,7 @@ class V4l2IocOps(object):
 
         Keyword arguments:
             index (int): the format index to read.
-            type (V4l2BufferType): the buffer type under inspection.
+            type (:py:class:`V4l2BufferType`): type of the data stream.
 
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.
@@ -267,7 +293,7 @@ class V4l2IocOps(object):
         Queries the cropping capabilities of a video device.
 
         Keyword arguments:
-            type (V4l2BufferType): the buffer type under inspection.
+            type (:py:class:`V4l2BufferType`): type of the data stream.
 
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.
@@ -279,7 +305,7 @@ class V4l2IocOps(object):
         Gets a cropping rectangle.
 
         Keyword arguments:
-            type (V4l2BufferType): the buffer type under inspection.
+            type (:py:class:`V4l2BufferType`): type of the data stream.
 
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.
@@ -291,8 +317,8 @@ class V4l2IocOps(object):
         Sets a cropping rectangle.
 
         Keyword arguments:
-            type (V4l2BufferType): the buffer type under inspection.
-            c (V4l2IoctlRect): the cropping rectangle to set.
+            type (:py:class:`V4l2BufferType`): type of the data stream.
+            c (:py:class:`V4l2IoctlRect`): the cropping rectangle to set.
 
         For more information see struct v4l2_fmtdesc in
         uapi/include/videodev2.h.
@@ -306,7 +332,7 @@ class V4l2IocOps(object):
 
         Keyword arguments:
             index (int): the frame size index to read.
-            pixel_format (V4l2Formats): the pixel format under inspection.
+            pixel_format (:py:class:`V4l2Formats`): the pixel format.
 
         For more information see struct v4l2_frmsizeenum in
         uapi/include/videodev2.h.
@@ -320,7 +346,7 @@ class V4l2IocOps(object):
 
         Keyword arguments:
             index (int): the frame interval index to read.
-            pixel_format (V4l2Formats): the pixel format under inspection.
+            pixel_format (:py:class:`V4l2Formats`): the pixel format.
             width (int): the frame width under inspection.
             height (int): the frame height under inspection.
 
@@ -328,11 +354,64 @@ class V4l2IocOps(object):
         uapi/include/videodev2.h.
         """
 
+    def get_format(self, type):
+        """Interface to the ioctl code VIDIOC_G_FMT.
+
+        Gets the data format.
+
+        Keyword arguments:
+            type (:py:class:`V4l2BufferType`): type of the data stream.
+
+        For more information see struct v4l2_format in
+        uapi/include/videodev2.h.
+        """
+
+    def set_format(self, type, fmt):
+        """Interface to the ioctl code VIDIOC_S_FMT.
+
+        Sets the data format.
+
+        Keyword arguments:
+            type (:py:class:`V4l2BufferType`): type of the data stream.
+            fmt (:py:class:`V4l2IoctlFormatUnion`): union of the format
+                structures filled according to the type.
+
+        For more information see struct v4l2_format in
+        uapi/include/videodev2.h.
+        """
+
+    def try_format(self, type, fmt):
+        """Interface to the ioctl code VIDIOC_S_FMT.
+
+        Tries the data format.
+        This is equivalent to :py:meth:`set_format` except it does not change
+        the driver state.
+
+        Keyword arguments:
+            type (:py:class:`V4l2BufferType`): type of the data stream.
+            fmt (:py:class:`V4l2IoctlFormatUnion`): union of the format
+                structures filled according to the type.
+
+        For more information see struct v4l2_format in
+        uapi/include/videodev2.h.
+        """
+
+    def request_buffers(self, count, type, memory):
+        """Interface to the ioctl code VIDIOC_REQBUFS.
+
+        Initialize the I/O buffers.
+
+        Keyword arguments:
+            count (int): THe number of buffers requested.
+            type (:py:class:`V4l2BufferType`): type of the data stream.
+            memory (:py:class: `V4l2Memory`): The v4l2 memory type.
+
+        For more information see struct v4l2_format in
+        uapi/include/videodev2.h.
+        """
+
     # TODO: To be implemented.
     """
-    G_FMT = _IOWR('V',  4, V4l2IoctlFormat)
-    S_FMT = _IOWR('V',  5, V4l2IoctlFormat)
-    REQBUFS = _IOWR('V',  8, V4l2IoctlRequestbuffers)
     QUERYBUF = _IOWR('V',  9, V4l2IoctlBuffer)
     G_FBUF = _IOR('V', 10, V4l2IoctlFramebuffer)
     S_FBUF = _IOW('V', 11, V4l2IoctlFramebuffer)
@@ -372,7 +451,6 @@ class V4l2IocOps(object):
     G_JPEGCOMP = _IOR('V', 61, V4l2IoctlJpegcompression)
     S_JPEGCOMP = _IOW('V', 62, V4l2IoctlJpegcompression)
     QUERYSTD = _IOR('V', 63, v4l2_std_id)
-    TRY_FMT = _IOWR('V', 64, V4l2IoctlFormat)
     ENUMAUDIO = _IOWR('V', 65, V4l2IoctlAudio)
     ENUMAUDOUT = _IOWR('V', 66, V4l2IoctlAudioout)
     G_PRIORITY = _IOR('V', 67, __u32)

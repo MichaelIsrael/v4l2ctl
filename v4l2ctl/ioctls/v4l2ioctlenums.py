@@ -942,3 +942,32 @@ class V4l2Quantization(IntEnum):
     #: Use the limited range quantization encoding. I.e. the range [0…1] is
     #: mapped to [16…235]. Cb and Cr are mapped from [-0.5…0.5] to [16…240].
     LIM_RANGE = 2
+
+
+class V4l2BufferCapabilities(IntFlag):
+    #: TODO
+    MMAP = 1 << 0
+    #: TODO
+    USERPTR = 1 << 1
+    #: TODO
+    DMABUF = 1 << 2
+    #: TODO
+    REQUESTS = 1 << 3
+    #: TODO
+    ORPHANED_BUFS = 1 << 4
+    #: TODO
+    M2M_HOLD_CAPTURE_BUF = 1 << 5
+    #: TODO
+    MMAP_CACHE_HINTS = 1 << 6
+
+
+class V4l2Memory(IntEnum):
+    """enum v4l2_memory"""
+    #: The buffer is used for memory mapping I/O.
+    MMAP = 1
+    #: The buffer is used for user pointer I/O.
+    USERPTR = 2
+    #: [to do]
+    OVERLAY = 3
+    #: The buffer is used for DMA shared buffer I/O.
+    DMABUF = 4
