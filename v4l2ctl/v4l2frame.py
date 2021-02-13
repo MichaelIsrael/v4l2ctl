@@ -65,14 +65,14 @@ class V4l2FrameSize(ABC):
         See :class:`V4l2DiscreteFrameSize` and :class:`V4l2StepwiseFrameSize`
         for the concrete implementation.
     """
-    def __new__(cls, ioc_ops, frame_size):
+    def __new__(cls, v4l2_device, frame_size):
         if frame_size.type == V4l2FrameSizeTypes.DISCRETE:
             return super().__new__(V4l2DiscreteFrameSize)
         else:
             return super().__new__(V4l2StepwiseFrameSize)
 
-    def __init__(self, ioc_ops, frame_size):
-        self._ioc_ops = ioc_ops
+    def __init__(self, v4l2_device, frame_size):
+        self._device = v4l2_device
         self._frame_size = frame_size
 
     @property
@@ -142,7 +142,7 @@ class V4l2DiscreteFrameSize(V4l2FrameSize):
         ival_idx = 0
         while ival_idx < 2**32:
             try:
-                frm_ival = self._ioc_ops.enum_frame_intervals(
+                frm_ival = self._device._ioc_ops.enum_frame_intervals(
                     index=ival_idx,
                     pixel_format=self._frame_size.pixel_format,
                     width=self.width,
@@ -183,7 +183,7 @@ class V4l2StepwiseFrameSize(V4l2FrameSize):
                                 frame_height[1]+1,
                                 frame_height[2]):
                 try:
-                    frm_ival = self._ioc_ops.enum_frame_intervals(
+                    frm_ival = self._device._ioc_ops.enum_frame_intervals(
                         index=0,
                         pixel_format=self._frame_size.pixel_format,
                         width=width,
