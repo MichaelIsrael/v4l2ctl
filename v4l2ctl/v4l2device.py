@@ -243,7 +243,7 @@ class V4l2Device(io.IOBase):
         """Iterate over the formats supported by a certain buffer.
 
         Keyword arguments:
-            buffer_type: see :class:`V4l2BufferType`.
+            buffer_type: see :py:class:`V4l2BufferType`.
 
         Returns:
             a generator
@@ -256,7 +256,7 @@ class V4l2Device(io.IOBase):
             except IoctlError:
                 break
             else:
-                yield V4l2Format(self._ioc_ops, fmt_desc)
+                yield V4l2Format(v4l2_device=self, fmt=fmt_desc)
             idx += 1
 
     @property
@@ -270,15 +270,53 @@ class V4l2Device(io.IOBase):
         return self.iter_buffer_formats(self.buffer_type)
 
     @property
+    def format(self):
+        """The data format (see :py:class:`V4l2Format`).
+
+        Note:
+            The formats are specfic to the set buffer type. (See
+            :py:attr:`~buffer_type`)
+        """
+        fmt = self._ioc_ops.get_format(type=self._buffer_type)
+        return V4l2Format(v4l2_device=self, fmt=fmt)
+
+    @format.setter
+    def format(self, format):
+        """Setter for the data format."""
+        self.set_format(format=format, buffer_type=self._buffer_type)
+
+    def set_format(self, format, buffer_type=None):
+        """Set the data format.
+
+        Note:
+            If buffer_type is None, the one set using the property buffer_type
+            of the V4l2Device will be used.
+
+            This is an efficient shortcut for::
+
+                device.buffer_type = BUFFER_TYPE
+                device.format = FORMAT
+                fmt = device.format
+
+        Returns:
+            The actual format set by the driver.
+        """
+        if not buffer_type:
+            buffer_type = self._buffer_type
+
+        fmt = self._ioc_ops.set_format(type=buffer_type, fmt=format._to_v4l2())
+        return V4l2Format(v4l2_device=self, fmt=fmt)
+
+    @property
     def supported_buffer_types(self):
         """The supported buffer types by this video device (read-only)."""
         return self._supported_buffer_types
 
     @property
     def buffer_type(self):
-        """The buffer type (see :class:`V4l2BufferType`) required for several
-        operations. This attribute does not change anything in the device
-        itself. It is used by other operations.
+        """The buffer type (see :py:class:`V4l2BufferType`) required for
+        several operations. This attribute does not change anything in the
+        device itself. It is used by other operations.
         """
         return self._buffer_type
 
@@ -293,7 +331,7 @@ class V4l2Device(io.IOBase):
 
     @property
     def cropping_rectangle(self):
-        """The cropping rectangle (see :class:`V4l2Rectangle`).
+        """The cropping rectangle (see :py:class:`V4l2Rectangle`).
 
         Note:
             The cropping rectange is specfic to the set buffer type. (See
