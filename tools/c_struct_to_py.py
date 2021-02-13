@@ -287,6 +287,13 @@ def main():
                            type=Path,
                            default=videodev2,
                            )
+    argparser.add_argument("-o",
+                           "--outfile",
+                           help="The file to write the python structs to.",
+                           action="store",
+                           type=Path,
+                           default="generated_structures.py"
+                           )
     argparser.add_argument("struct",
                            help="the structure to convert.",
                            action="store",
@@ -314,7 +321,7 @@ def main():
     visitor = StructVisitor()
     visitor.visit(code)
 
-    with open("generated_structures.py", "w") as f:
+    with open(args.outfile, "w") as f:
         dump_python_structures(f, visitor.get_nodes(args.struct))
 
     return 0
