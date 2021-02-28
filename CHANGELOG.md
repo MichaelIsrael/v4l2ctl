@@ -1,5 +1,8 @@
 # v4l2ctl change log
 
+## 0.1a5
+* Fix issue #1 (importing from utils)
+
 ## 0.1a4
 * Support cropping rectangles (querying, getting and setting).
 * Support setting and getting formats.

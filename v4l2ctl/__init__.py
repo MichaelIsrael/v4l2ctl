@@ -19,7 +19,7 @@ __all__ = ["V4l2Device", "V4l2Capabilities", "V4l2BufferType", "V4l2Formats",
            "IoctlError", "FeatureNotSupported"
            ]
 __author__ = "Michael Israel"
-__version__ = "0.1a4"
+__version__ = "0.1a5"
 
 
 from .v4l2device import V4l2Device, FeatureNotSupported
