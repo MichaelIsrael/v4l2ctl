@@ -41,7 +41,8 @@ class V4l2FrameInterval(object):
             fractions of the form (min, max, step).
         """
         if self.type == V4l2FrameIvalTypes.DISCRETE:
-            return V4l2Fraction(self._frame_ival.discrete)
+            return V4l2Fraction(self._frame_ival.discrete.numerator, 
+                                self._frame_ival.discrete.denominator)
         else:
             return (V4l2Fraction(self._frame_ival.stepwise.min),
                     V4l2Fraction(self._frame_ival.stepwise.max),
